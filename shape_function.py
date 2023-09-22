@@ -60,11 +60,9 @@ def p(point):
     return np.array([[1],[p.x],[p.y]]).T
     
 
-def A(point, all_points):
+def A(any_point, all_points):
     A_local = np.zeros((m + 2, m + 2))
-    any_point = point
-    for point in all_points:
-        point_i = point
+    for point_i in all_points:
         A_local += weight_func(x=any_point.x, x_i=point_i.x) * weight_func(x=any_point.y, x_i=point_i.y)\
               * np.array([[1,            point_i.x,              point_i.y],
                         [point_i.x,    point_i.x ** 2,         point_i.x * point_i.y],
@@ -76,12 +74,11 @@ def A(point, all_points):
 def B(point, all_points):
     B_local = np.zeros((m + 2, n))
     k = 0
-    for i in range(n_x):
-        for j in range(n_y):
-            B_local[0, k] = 1 * weight_func(point=point, point_i=all_points[i][j])
-            B_local[1, k] = all_points[i][j].x * weight_func(point=point, point_i=all_points[i][j])
-            B_local[2, k] = all_points[i][j].y * weight_func(point=point, point_i=all_points[i][j])
-            k += 1
+    for point_i in all_points:
+        B_local[0, k] = 1 * weight_func(point=point.x, point_i=point_i.x) * weight_func(point=point.y, point_i=point_i.y)
+        B_local[1, k] = point_i.x * weight_func(point=point, point_i=point_i)
+        B_local[2, k] = point_i.y * weight_func(point=point, point_i=point_i)
+        k += 1
 
     return np.array(B_local)
 
@@ -89,14 +86,11 @@ def B(point, all_points):
 # Первые производные матрицы А
 def dA_dx(point, all_points):
     A_local = np.zeros((m + 2, m + 2))
-    for i in range(n_x):
-        for j in range(n_y):
-            point_i = all_points[i][j]
-            if point != point_i:
-                A_local += d_weight_func(x=point.x, x_i=point_i.x) * weight_func(x=point.y, x_i=point_i.y)\
-                      * np.array([[1,            point_i.x,              point_i.y],
-                                [point_i.x,    point_i.x ** 2,         point_i.x * point_i.y],
-                                [point_i.y,    point_i.x * point_i.y,  point_i.y ** 2]])
+    for point_i in all_points:
+        A_local += d_weight_func(x=point.x, x_i=point_i.x) * weight_func(x=point.y, x_i=point_i.y)\
+              * np.array([[1,            point_i.x,              point_i.y],
+                        [point_i.x,    point_i.x ** 2,         point_i.x * point_i.y],
+                        [point_i.y,    point_i.x * point_i.y,  point_i.y ** 2]])
     return np.array(A_local)
 
 
@@ -260,7 +254,8 @@ def d2Fdx2(point, all_points):
                     2 * np.dot(np.dot(np.transpose(dp_dx(point)),np.linalg.inv(dA_dx(point, all_points))),B(point, all_points)) +\
                     2 * np.dot(np.dot(np.transpose(dp_dx(point)),np.linalg.inv(A(point, all_points))),dB_dx(point, all_points)) +\
                     2 * np.dot(np.dot(np.transpose(p(point)),np.linalg.inv(dA_dx(point, all_points))),dB_dx(point, all_points))
-    
+    print(d2Fdx2_result)
+    exit()
     return d2Fdx2_result
 
 
