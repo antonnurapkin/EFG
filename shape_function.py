@@ -3,13 +3,12 @@ import numpy as np
 from EFG.components_shape_function.A import A, dA_dx, dA_dy, d2A_dx2, d2A_dy2, d2A_dydx
 from EFG.components_shape_function.B import dB_dx, dB_dy, d2B_dx2, d2B_dy2, B, d2B_dydx
 from EFG.components_shape_function.p import p, dp_dx, dp_dy, d2p_dx2, d2p_dy2, d2p_dydx
-from params import n_x, n_y
 
 
 # Функции формы и её вторые производные
-def F(point):
-    F_result = np.dot(np.dot(np.transpose(p(point)), np.linalg.inv(A(point))), B(point))
-    return F_result
+def F(point, all_points):
+    F_result = np.dot(np.dot(np.transpose(p(point)), np.linalg.inv(A(point, all_points))), B(point, all_points))
+    return F_result[0]
 
 
 def d2Fdx2(point, all_points):
