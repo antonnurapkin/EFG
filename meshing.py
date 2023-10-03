@@ -14,6 +14,7 @@ class Cell:
         self.nodes = []
         self.gauss_points = []
         self.neighbors = []
+        self.jacobian = self.w * self.h / 4
 
 
 # Класс для узла
@@ -29,9 +30,10 @@ class Node:
 
 # Класс для точки Гаусса
 class Point:
-    def __init__(self, x, y):
+    def __init__(self, x, y, weight):
         self.x = x
         self.y = y
+        self.weight = weight
 
 
 # Создание списков соседей
@@ -179,13 +181,16 @@ def append_Gauss_points(all_cells):
         [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
     ]
 
+    weight = 1
+
     for row in all_cells:
         for cell in row:
             for coord in coords:
                 cell.gauss_points.append(
                     Point(
                         x=x(coord[0], coord[1], cell.x, cell.x + cell.w),
-                        y=y(coord[0], coord[1], cell.y, cell.y + cell.h)
+                        y=y(coord[0], coord[1], cell.y, cell.y + cell.h),
+                        weight=weight
                     )
                 )
                 
@@ -214,29 +219,6 @@ def create_cells(n_x, n_y, l_x, l_y):
 cells = create_cells(n_x, n_y, l_x, l_y)
 
 
-# x_gp = []
-# y_gp = []
-
-# x_n = []
-# y_n = []
-
-
-# for row in cells:
-#     for cell in row:
-#         for point in cell.gauss_points:
-#             x_gp.append(point.x)
-#             y_gp.append(point.y)
-
-#         for node in cell.nodes:
-#             x_n.append(node.x)
-#             y_n.append(node.y)
-
-
-
-# fig = go.Figure(go.Scatter(x=x_gp, y=y_gp, mode='markers'))
-# fig.add_trace(go.Scatter(x=x_n, y=y_n, mode='markers'))
-
-# fig.show()
 
 
 
