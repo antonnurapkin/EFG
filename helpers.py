@@ -3,7 +3,7 @@ import numpy as np
 from EFG.meshing import Cell, Point
 from EFG.params import ds_x, ds_y
 
-from EFG.shape_function import d2Fdx2, d2Fdy2, d2Fdydx
+from EFG.shape_function import d2Fdx2, d2Fdy2, d2Fdydx, F
 
 
 def calculate_r(point, node, ds_x, ds_y):
@@ -15,7 +15,7 @@ def calculate_r(point, node, ds_x, ds_y):
 
 def B_matrix(q_point, nodes_in_domain):
 
-    F_vector = np.vstack(
+    B_vector = np.vstack(
         (
             -d2Fdx2(q_point, nodes_in_domain),
             -d2Fdy2(q_point, nodes_in_domain),
@@ -23,7 +23,10 @@ def B_matrix(q_point, nodes_in_domain):
         )
     )
 
-    return np.resize(F_vector, (3, len(nodes_in_domain)))
+    return np.resize(B_vector, (3, len(nodes_in_domain)))
+
+def F_vector(q_point, nodes_in_domain):
+    return F(q_point, nodes_in_domain)
 
 
 def search_nodes_in_domain(current_cell: Cell, q_point: Point):

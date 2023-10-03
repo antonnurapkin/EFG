@@ -4,7 +4,7 @@ import numpy as np
 # Степень аппроксимирующего полинома
 m = 1
 
-""" ДАННЫЕ О СЕТКЕ """
+# Данные о сетке
 n_x = 5
 n_y = 5
 n = n_x * n_y
@@ -20,9 +20,9 @@ elem_y = n_y - 1
 step_x = l_x / (n_x - 1)
 step_y = l_y / (n_y - 1)
 
-# Size of support domain
+# Размер области поддержки
 # x
-dc_x = step_x  # charasteristic length ( length beetwen two nodes)
+dc_x = step_x  # характеристическая длина ( расстояние между двумя узлами )
 alpha_x = 2
 
 ds_x = alpha_x * dc_x
@@ -34,21 +34,22 @@ alpha_y = 2
 ds_y = alpha_y * dc_y
 
 
-""" ПАРАМЕТРЫ МАТЕРИАЛА"""
+# Параметры материала
 
 mu = 0.3
 E = 2e5
 
-D = (E / 1 - mu ** 2) * np.array(
-                                [
-                                    [1, mu, 0],
-                                    [mu, 1, 0],
-                                    [0, 0, (1 - mu) / 2]
-                                ]
-                            )
+D_init = [[1, mu, 0],
+          [mu, 1, 0],
+          [0, 0, (1 - mu) / 2]]
 
-"""НАГРУЖЕНИЕ"""
-b = np.array([[0],[0],[-100]])
+D = (E / 1 - mu ** 2) * np.array(D_init)
+
+# Нагружение
+b = np.array([[0], [0], [-100]])
+
+# Толщина пластина
+THICKNESS = 0.1
 
 
 
