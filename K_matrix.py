@@ -1,9 +1,11 @@
-from EFG.f_vector import create_f_vector, f_global_assemble
 from EFG.helpers import B_matrix, search_nodes_in_domain
-from params import D, b
+from params import D, n_x, n_y
 from meshing import cells
 import numpy as np
+import pandas as pd
+from time import time
 
+start = time()
 
 def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexes):
     size = len(nodes_in_domain)
@@ -36,13 +38,11 @@ def K_global_assemble(K_global, K_local_vector_n_indexes):
 
 
 def create_K_global(cells, n_x, n_y):
-
     K_global = np.zeros((n_x * n_y, n_x * n_y))
 
     for i in range(len(cells)):
         for j in range(len(cells[i])):
             for point in cells[i][j].gauss_points:
-
                 nodes_in_domain, global_indexes = search_nodes_in_domain(q_point=point, current_cell=cells[i][j])
                 B = B_matrix(q_point=point, nodes_in_domain=nodes_in_domain)
 
@@ -56,9 +56,12 @@ def create_K_global(cells, n_x, n_y):
                     global_indexes
                 )
 
-                K_global = K_global_assemble(K_global, K_local_vector_n_indexes)
+                index_1 = K_local_vector_n_indexes[:, 1]
+                index_2 = K_local_vector_n_indexes[:, 2]
+                K_global[index_1.astype(int), index_2.astype(int)] += K_local_vector_n_indexes[:, 0]
 
     return K_global
+
 
 # K, f = create_K_global(cells, n_x, n_y)
 #
@@ -118,18 +121,3 @@ def create_K_global(cells, n_x, n_y):
 #         y=[0.0, 0.25, 0.5, 0.75, 0.5]
 #     ))
 # fig.show()
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
