@@ -51,7 +51,7 @@ def create_f_global(cells, n_x, n_y):
                     cells[i][j].jacobian,
                     global_indexes
                 )
-
+                #TODO: Оптимизировать с помощью индексации в numpy
                 f_global = f_global_assemble(f_global, f_local_vector_n_indexes)
 
     return f_global

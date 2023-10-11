@@ -4,6 +4,7 @@ from meshing import cells
 import numpy as np
 import pandas as pd
 from time import time
+from numpy.linalg import eig
 
 start = time()
 
@@ -30,11 +31,11 @@ def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexe
     return K_local_vector_n_indexes
 
 
-def K_global_assemble(K_global, K_local_vector_n_indexes):
-    for elem in K_local_vector_n_indexes:
-        K_global[int(elem[1]), int(elem[2])] += elem[0]
-
-    return K_global
+# def K_global_assemble(K_global, K_local_vector_n_indexes):
+#     for elem in K_local_vector_n_indexes:
+#         K_global[int(elem[1]), int(elem[2])] += elem[0]
+#
+#     return K_global
 
 
 def create_K_global(cells, n_x, n_y):
@@ -63,7 +64,11 @@ def create_K_global(cells, n_x, n_y):
     return K_global
 
 
-# K, f = create_K_global(cells, n_x, n_y)
+K = create_K_global(cells, n_x, n_y)
+
+# df = pd.DataFrame(K)
+# df.to_excel("K_1.xlsx")
+
 #
 # global_indexes = []
 # all_nodes = []

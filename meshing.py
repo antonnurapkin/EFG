@@ -4,6 +4,9 @@ import plotly.express as px
 from params import n_x, n_y, elem_x, elem_y, step_x, step_y, l_x, l_y
 
 
+WEIGHT = 1
+
+
 # Класс для клетки
 class Cell:
     def __init__(self, x, y):
@@ -15,6 +18,12 @@ class Cell:
         self.gauss_points = []
         self.neighbors = []
         self.jacobian = self.w * self.h / 4
+
+        # Создаются в процессе при необходимости
+        # self.left_bound_gauss_points = None
+        # self.right_bound_gauss_points = None
+        # self.top_bound_gauss_points = None
+        # self.bottom_bound_gauss_points = None
 
 
 # Класс для узла
@@ -139,6 +148,7 @@ def append_neighbors(all_cells):
 def append_nodes(all_cells):
     for row in all_cells:
         for cell in row:
+
             cell.nodes.extend(
                 [
                     Node(x=cell.x, y=cell.y, local_index=1),
@@ -163,6 +173,7 @@ def global_indexes_for_nodes(all_cells):
 
 
 # Функции для определения точек Гаусса внутри клетки
+# TODO: Исправить эти функции, чтобы были параметры по умолчанию и можно было использовать для граничных гаусс. точек
 def x(ksi, nu, x0, x1):
     return (x1 - x0) * (ksi + 1) / 2 + x0
 
@@ -171,28 +182,83 @@ def y(ksi, nu, y0, y1):
     return (y1 - y0) * (nu + 1) / 2 + y0
 
 
+def create_Gauss_points_for_bound(cell):
+
+    coords_gpoints_on_bound = [
+        -1 / np.sqrt(3),
+        1 / np.sqrt(3)
+    ]
+
+    # Гауссовы точки для границы
+    if cell.x == 0:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=0,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+
+    elif cell.x == l_x - cell.w:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=l_x,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+
+    if cell.y == 0:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    y=0,
+                    weight=WEIGHT
+                )
+            )
+
+    elif cell.y == l_y - cell.h:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    y=l_y,
+                    weight=WEIGHT
+                )
+            )
+
+    return cell
+
 # Cоздание точек Гаусса
 def append_Gauss_points(all_cells):
     # По часовой стрелке
-    coords = [
+    coords_gpoints_in_elem = [
         [ -1 / np.sqrt(3), 1 / np.sqrt(3)],
         [ 1 / np.sqrt(3), 1 / np.sqrt(3)],
         [ 1 / np.sqrt(3), -1 / np.sqrt(3)],
         [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
     ]
 
-    weight = 1
-
-    for row in all_cells:
-        for cell in row:
-            for coord in coords:
+    for i in range(len(all_cells)):
+        for j in range(len(all_cells[i])):
+            cell = all_cells[i][j]
+            for coord in coords_gpoints_in_elem:
                 cell.gauss_points.append(
                     Point(
                         x=x(coord[0], coord[1], cell.x, cell.x + cell.w),
                         y=y(coord[0], coord[1], cell.y, cell.y + cell.h),
-                        weight=weight
+                        weight=WEIGHT
                     )
                 )
+
+            all_cells[i][j] = create_Gauss_points_for_bound(cell)
                 
     return all_cells
             
@@ -202,6 +268,7 @@ def create_cells(n_x, n_y, l_x, l_y):
 
     all_cells = []
 
+    # TODO: Заменить на генератор
     for i in range(0, n_y - 1):
         row = []
         for j in range(0, n_x - 1):
@@ -217,12 +284,6 @@ def create_cells(n_x, n_y, l_x, l_y):
 
 
 cells = create_cells(n_x, n_y, l_x, l_y)
-
-
-
-
-
-
 
 
 
