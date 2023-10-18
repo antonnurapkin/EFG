@@ -18,6 +18,7 @@ class Cell:
         self.gauss_points = []
         self.neighbors = []
         self.jacobian = self.w * self.h / 4
+        self.boundary_Gauss_points = None
 
         # Создаются в процессе при необходимости
         # self.left_bound_gauss_points = None
@@ -190,7 +191,7 @@ def create_Gauss_points_for_bound(cell):
     ]
 
     # Гауссовы точки для границы
-    if cell.x == 0:
+    if cell.x == 0 and (cell.y != 0 or round(cell.y, 5) != round(l_y - cell.h, 5)):
         cell.boundary_Gauss_points = []
         for coord in coords_gpoints_on_bound:
             cell.boundary_Gauss_points.append(
@@ -201,7 +202,7 @@ def create_Gauss_points_for_bound(cell):
                 )
             )
 
-    elif cell.x == l_x - cell.w:
+    elif round(cell.x, 5) == round(l_x - cell.w, 5) and (cell.y != 0 or round(cell.y, 5) != round(l_y - cell.h, 5)):
         cell.boundary_Gauss_points = []
         for coord in coords_gpoints_on_bound:
             cell.boundary_Gauss_points.append(
@@ -212,7 +213,7 @@ def create_Gauss_points_for_bound(cell):
                 )
             )
 
-    if cell.y == 0:
+    if cell.y == 0 and (cell.x != 0 or round(cell.x, 5) != round(l_x - cell.w, 5)):
         cell.boundary_Gauss_points = []
         for coord in coords_gpoints_on_bound:
             cell.boundary_Gauss_points.append(
@@ -223,7 +224,7 @@ def create_Gauss_points_for_bound(cell):
                 )
             )
 
-    elif cell.y == l_y - cell.h:
+    elif round(cell.y, 5) == round(l_y - cell.h, 5) and (cell.x != 0 or round(cell.x, 5) != round(l_x - cell.w, 5)):
         cell.boundary_Gauss_points = []
         for coord in coords_gpoints_on_bound:
             cell.boundary_Gauss_points.append(
@@ -233,6 +234,84 @@ def create_Gauss_points_for_bound(cell):
                     weight=WEIGHT
                 )
             )
+
+    # Углы
+    if cell.x == 0 and cell.y == 0:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=0,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                    Point(
+                        x=x(coord, None, cell.x, cell.x + cell.w),
+                        y=0,
+                        weight=WEIGHT
+                    )
+                )
+
+    elif cell.x == 0 and round(cell.y, 5) == round(l_y - cell.h, 5):
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=0,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    y=l_y,
+                    weight=WEIGHT
+                )
+            )
+
+    elif round(cell.x, 5) == round(l_x - cell.w, 5) and round(cell.y, 5) == round(l_y - cell.h, 5):
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    y=l_y,
+                    weight=WEIGHT
+                )
+            )
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=l_x,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+
+    elif round(cell.x, 5) == round(l_x - cell.w, 5) and cell.y == 0:
+        cell.boundary_Gauss_points = []
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=l_x,
+                    y=y(None, coord, cell.y, cell.y + cell.h),
+                    weight=WEIGHT
+                )
+            )
+        for coord in coords_gpoints_on_bound:
+            cell.boundary_Gauss_points.append(
+                Point(
+                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    y=0,
+                    weight=WEIGHT
+                )
+            )
+
 
     return cell
 
@@ -280,7 +359,7 @@ def create_cells(n_x, n_y, l_x, l_y):
     all_cells = append_Gauss_points(all_cells=all_cells)
     all_cells = global_indexes_for_nodes(all_cells=all_cells)
 
-    return all_cells
+    return np.array(all_cells, dtype="object")
 
 
 cells = create_cells(n_x, n_y, l_x, l_y)

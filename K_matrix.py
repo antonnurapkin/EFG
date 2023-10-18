@@ -31,13 +31,6 @@ def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexe
     return K_local_vector_n_indexes
 
 
-# def K_global_assemble(K_global, K_local_vector_n_indexes):
-#     for elem in K_local_vector_n_indexes:
-#         K_global[int(elem[1]), int(elem[2])] += elem[0]
-#
-#     return K_global
-
-
 def create_K_global(cells, n_x, n_y):
     K_global = np.zeros((n_x * n_y, n_x * n_y))
 
