@@ -1,13 +1,10 @@
 import numpy as np
 from helpers import search_nodes_in_domain, F_vector
-from params import b, n_x, n_y, THICKNESS
-from meshing import cells
-from plotly import graph_objects as go
-
+from params import b, THICKNESS
 
 def create_f_vector(F, b, nodes_in_domain, weight, jacobian, global_indexes):
     size = len(nodes_in_domain)
-    f_local_vector_n_index = np.empty((0,2))
+    f_local_vector_n_index = np.empty((0, 2))
 
     for i in range(size):
         f_local_vector_n_index = np.append(
@@ -31,7 +28,7 @@ def f_global_assemble(f_global, f_local_vector_n_indexes):
     return f_global
 
 
-def create_f_global(cells, n_x, n_y):
+def f_global(cells, n_x, n_y):
 
     f_global = np.zeros((n_x * n_y, 1))
 
@@ -55,6 +52,3 @@ def create_f_global(cells, n_x, n_y):
                 f_global = f_global_assemble(f_global, f_local_vector_n_indexes)
 
     return f_global
-
-
-f = create_f_global(cells=cells, n_x=n_x, n_y=n_y)

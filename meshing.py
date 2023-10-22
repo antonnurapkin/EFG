@@ -4,9 +4,6 @@ import plotly.express as px
 from params import n_x, n_y, elem_x, elem_y, step_x, step_y, l_x, l_y
 
 
-WEIGHT = 1
-
-
 # Класс для клетки
 class Cell:
     def __init__(self, x, y):
@@ -34,8 +31,10 @@ class Node:
         self.y = y
         self.z = 0
 
+        self.z_solve = None
         self.local_index = local_index
         self.global_index = None
+        self.calculated_displ = False
 
 
 # Класс для точки Гаусса
@@ -145,6 +144,7 @@ def append_neighbors(all_cells):
         
     return all_cells
 
+
 # Создание узлов
 def append_nodes(all_cells):
     for row in all_cells:
@@ -160,6 +160,7 @@ def append_nodes(all_cells):
             )
 
     return all_cells
+
 
 # Глобальная индексация узлов
 def global_indexes_for_nodes(all_cells):
@@ -186,129 +187,138 @@ def y(ksi, nu, y0, y1):
 def create_Gauss_points_for_bound(cell):
 
     coords_gpoints_on_bound = [
-        -1 / np.sqrt(3),
-        1 / np.sqrt(3)
+        -0.8611363,
+        - 0.3399810,
+        0.3399810,
+        0.8611363,
+    ]
+
+    weight_gpoints_on_bound = [
+        0.3478548,
+        0.6521451,
+        0.6521451,
+        0.3478548,
     ]
 
     # Гауссовы точки для границы
     if cell.x == 0 and (cell.y != 0 or round(cell.y, 5) != round(l_y - cell.h, 5)):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=0,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     elif round(cell.x, 5) == round(l_x - cell.w, 5) and (cell.y != 0 or round(cell.y, 5) != round(l_y - cell.h, 5)):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=l_x,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     if cell.y == 0 and (cell.x != 0 or round(cell.x, 5) != round(l_x - cell.w, 5)):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
-                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                     y=0,
-                    weight=WEIGHT
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     elif round(cell.y, 5) == round(l_y - cell.h, 5) and (cell.x != 0 or round(cell.x, 5) != round(l_x - cell.w, 5)):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
-                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                     y=l_y,
-                    weight=WEIGHT
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     # Углы
     if cell.x == 0 and cell.y == 0:
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=0,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                     Point(
-                        x=x(coord, None, cell.x, cell.x + cell.w),
+                        x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                         y=0,
-                        weight=WEIGHT
+                        weight=weight_gpoints_on_bound[i]
                     )
                 )
 
     elif cell.x == 0 and round(cell.y, 5) == round(l_y - cell.h, 5):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=0,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
-                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                     y=l_y,
-                    weight=WEIGHT
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     elif round(cell.x, 5) == round(l_x - cell.w, 5) and round(cell.y, 5) == round(l_y - cell.h, 5):
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
-                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                     y=l_y,
-                    weight=WEIGHT
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=l_x,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
     elif round(cell.x, 5) == round(l_x - cell.w, 5) and cell.y == 0:
         cell.boundary_Gauss_points = []
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
                     x=l_x,
-                    y=y(None, coord, cell.y, cell.y + cell.h),
-                    weight=WEIGHT
+                    y=y(None, coords_gpoints_on_bound[i], cell.y, cell.y + cell.h),
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
-        for coord in coords_gpoints_on_bound:
+        for i in range(len(coords_gpoints_on_bound)):
             cell.boundary_Gauss_points.append(
                 Point(
-                    x=x(coord, None, cell.x, cell.x + cell.w),
+                    x=x(coords_gpoints_on_bound[i], None, cell.x, cell.x + cell.w),
                     y=0,
-                    weight=WEIGHT
+                    weight=weight_gpoints_on_bound[i]
                 )
             )
 
@@ -325,6 +335,8 @@ def append_Gauss_points(all_cells):
         [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
     ]
 
+    weight = 1
+
     for i in range(len(all_cells)):
         for j in range(len(all_cells[i])):
             cell = all_cells[i][j]
@@ -333,7 +345,7 @@ def append_Gauss_points(all_cells):
                     Point(
                         x=x(coord[0], coord[1], cell.x, cell.x + cell.w),
                         y=y(coord[0], coord[1], cell.y, cell.y + cell.h),
-                        weight=WEIGHT
+                        weight=weight
                     )
                 )
 
@@ -360,9 +372,6 @@ def create_cells(n_x, n_y, l_x, l_y):
     all_cells = global_indexes_for_nodes(all_cells=all_cells)
 
     return np.array(all_cells, dtype="object")
-
-
-cells = create_cells(n_x, n_y, l_x, l_y)
 
 
 

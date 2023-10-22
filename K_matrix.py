@@ -1,10 +1,7 @@
-from EFG.helpers import B_matrix, search_nodes_in_domain
-from params import D, n_x, n_y
-from meshing import cells
+from helpers import B_matrix, search_nodes_in_domain
+from params import D
 import numpy as np
-import pandas as pd
 from time import time
-from numpy.linalg import eig
 
 start = time()
 
@@ -31,7 +28,7 @@ def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexe
     return K_local_vector_n_indexes
 
 
-def create_K_global(cells, n_x, n_y):
+def K_global(cells, n_x, n_y):
     K_global = np.zeros((n_x * n_y, n_x * n_y))
 
     for i in range(len(cells)):
@@ -55,9 +52,6 @@ def create_K_global(cells, n_x, n_y):
                 K_global[index_1.astype(int), index_2.astype(int)] += K_local_vector_n_indexes[:, 0]
 
     return K_global
-
-
-K = create_K_global(cells, n_x, n_y)
 
 # df = pd.DataFrame(K)
 # df.to_excel("K_1.xlsx")
