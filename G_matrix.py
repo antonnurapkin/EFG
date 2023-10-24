@@ -60,8 +60,6 @@ def create_G_matrix(bound_cells, coords, indexes, n_x, n_y):
         for point in bound_cells[index_cell].boundary_Gauss_points[:4]:
             nodes_in_domain, global_indexes = search_nodes_in_domain(q_point=point, current_cell=bound_cells[index_cell])
 
-            print(len(global_indexes))
-
             if current_coord == 1:
                 s_coord = point.y
             else:

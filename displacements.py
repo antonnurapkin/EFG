@@ -35,16 +35,18 @@ def calculate_real_displacements(cells):
 
 
 def create_U_array(cells, n_x, n_y):
-    # k = 0
+
+    added_indexes = []
+
     U = np.zeros((n_y * n_x, 1))
     for i in range(len(cells[0])):
         for j in range(len(cells)):
             for node in cells[j][i].nodes:
-                if U[node.global_index] == 0:
+                if node.global_index not in added_indexes:
                     U[node.global_index] = node.z
+                    added_indexes.append(node.global_index)
 
     return np.transpose(np.reshape(U, (n_y, n_x)))
-    # return U
 
 
 def get_displaments_array(cells, u, n_x, n_y):
