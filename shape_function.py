@@ -12,37 +12,52 @@ def F(point, all_points):
 
 
 def d2Fdx2(point, all_points):
-    d2Fdx2_result = np.dot(np.dot(np.transpose(d2p_dx2(point)), np.linalg.inv(A(point, all_points))), B(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), inverse_dif(d2A_dx2(point, all_points), A(point, all_points))), B(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), np.linalg.inv(A(point, all_points))), d2B_dx2(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(dp_dx(point)), inverse_dif(dA_dx(point, all_points), A(point, all_points))), B(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(dp_dx(point)), np.linalg.inv(A(point, all_points))), dB_dx(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(p(point)), inverse_dif(dA_dx(point, all_points), A(point, all_points))), dB_dx(point, all_points))
-                    
+    A_matrix = A(point, all_points)
+    p_T = np.transpose(p(point))
+    B_matrix = B(point, all_points)
+
+    d2Fdx2_result = np.dot(np.dot(np.transpose(d2p_dx2(point)), np.linalg.inv(A_matrix)), B_matrix) + \
+                    np.dot(np.dot(p_T, inverse_dif(d2A_dx2(point, all_points), A_matrix)),
+                           B_matrix) + \
+                    np.dot(np.dot(p_T, np.linalg.inv(A_matrix)), d2B_dx2(point, all_points)) + \
+                    2 * np.dot(np.dot(np.transpose(dp_dx(point)), inverse_dif(dA_dx(point, all_points), A_matrix)),
+                               B_matrix) + \
+                    2 * np.dot(np.dot(np.transpose(dp_dx(point)), np.linalg.inv(A_matrix)), dB_dx(point, all_points)) + \
+                    2 * np.dot(np.dot(p_T, inverse_dif(dA_dx(point, all_points), A_matrix)),
+                               dB_dx(point, all_points))
+
     return d2Fdx2_result
 
 
 def d2Fdy2(point, all_points):
+    A_matrix = A(point, all_points)
+    p_T = np.transpose(p(point))
+    B_matrix = B(point, all_points)
+    d2Fdy2_result = np.dot(np.dot(np.transpose(d2p_dy2(point)), np.linalg.inv(A_matrix)), B_matrix) + \
+                    np.dot(np.dot(p_T, inverse_dif(d2A_dy2(point, all_points), A_matrix)), B_matrix) + \
+                    np.dot(np.dot(p_T, np.linalg.inv(A_matrix)), d2B_dy2(point, all_points)) + \
+                    2 * np.dot(np.dot(np.transpose(dp_dy(point)), inverse_dif(dA_dy(point, all_points), A_matrix)),
+                               B_matrix) + \
+                    2 * np.dot(np.dot(np.transpose(dp_dy(point)), np.linalg.inv(A_matrix)), dB_dy(point, all_points)) + \
+                    2 * np.dot(np.dot(p_T, inverse_dif(dA_dy(point, all_points), A_matrix)), dB_dy(point, all_points))
 
-    d2Fdy2_result = np.dot(np.dot(np.transpose(d2p_dy2(point)), np.linalg.inv(A(point, all_points))), B(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), inverse_dif(d2A_dy2(point, all_points), A(point, all_points))), B(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), np.linalg.inv(A(point, all_points))), d2B_dy2(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(dp_dy(point)), inverse_dif(dA_dy(point, all_points), A(point, all_points))), B(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(dp_dy(point)), np.linalg.inv(A(point, all_points))), dB_dy(point, all_points)) + \
-                    2 * np.dot(np.dot(np.transpose(p(point)), inverse_dif(dA_dy(point, all_points), A(point, all_points))), dB_dy(point, all_points))
-    
     return d2Fdy2_result
 
 
 def d2Fdydx(point, all_points):
-    d2Fdydx_result = np.dot(np.dot(np.transpose(d2p_dydx(point)), np.linalg.inv(A(point, all_points))), B(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(dp_dx(point)), inverse_dif(dA_dy(point, all_points), A(point, all_points))), B(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(dp_dx(point)), np.linalg.inv(A(point, all_points))), dB_dy(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(dp_dy(point)), inverse_dif(dA_dx(point, all_points), A(point, all_points))), B(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(p(point)), inverse_dif(d2A_dydx(point, all_points), A(point, all_points))), dB_dy(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(p(point)), inverse_dif(dA_dx(point, all_points), A(point, all_points))), dB_dy(point, all_points)) +\
-                    np.dot(np.dot(np.transpose(dp_dy(point)), np.linalg.inv(A(point, all_points))), dB_dx(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), inverse_dif(dA_dy(point, all_points), A(point, all_points))), dB_dx(point, all_points)) + \
-                    np.dot(np.dot(np.transpose(p(point)), np.linalg.inv(A(point, all_points))), d2B_dydx(point, all_points))
+    A_matrix = A(point, all_points)
+    p_T = np.transpose(p(point))
+    B_matrix = B(point, all_points)
+    d2Fdydx_result = np.dot(np.dot(np.transpose(d2p_dydx(point)), np.linalg.inv(A_matrix)), B_matrix) + \
+                     np.dot(np.dot(np.transpose(dp_dx(point)), inverse_dif(dA_dy(point, all_points), A_matrix)),
+                            B_matrix) + \
+                     np.dot(np.dot(np.transpose(dp_dx(point)), np.linalg.inv(A_matrix)), dB_dy(point, all_points)) + \
+                     np.dot(np.dot(np.transpose(dp_dy(point)), inverse_dif(dA_dx(point, all_points), A_matrix)),
+                            B_matrix) + \
+                     np.dot(np.dot(p_T, inverse_dif(d2A_dydx(point, all_points), A_matrix)), B_matrix) + \
+                     np.dot(np.dot(p_T, inverse_dif(dA_dx(point, all_points), A_matrix)), dB_dy(point, all_points)) + \
+                     np.dot(np.dot(np.transpose(dp_dy(point)), np.linalg.inv(A_matrix)), dB_dx(point, all_points)) + \
+                     np.dot(np.dot(p_T, inverse_dif(dA_dy(point, all_points), A_matrix)), dB_dx(point, all_points)) + \
+                     np.dot(np.dot(p_T, np.linalg.inv(A_matrix)), d2B_dydx(point, all_points))
 
     return d2Fdydx_result

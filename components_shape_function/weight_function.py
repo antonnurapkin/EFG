@@ -11,9 +11,8 @@ def Dirac_delta(x):
 
 # Весовая функция и её производные
 def weight_func(x, x_i):
-
     # d_c = (step_x ** 2 + step_y ** 2)**0.5
-    d_c = 0.2
+    d_c = max([step_x, step_y])
 
     d_s = alpha_x * d_c
     r = abs(x - x_i) / d_s
@@ -28,8 +27,8 @@ def weight_func(x, x_i):
 
 def d_weight_func(x, x_i):
 
-    # d_c = (step_x ** 2 + step_y ** 2 ) ** 0.5
-    d_c = 0.2
+    d_c = max([step_x, step_y])
+
     d_s = alpha_x * d_c
     r = abs(x - x_i) / d_s
 
@@ -44,8 +43,8 @@ def d_weight_func(x, x_i):
 
 
 def d2_weight_func(x, x_i):
-    # d_c = (step_x ** 2 + step_y ** 2) ** 0.5
-    d_c = 0.2
+
+    d_c = max([step_x, step_y])
 
     d_s = alpha_x * d_c
     r = abs(x - x_i) / d_s

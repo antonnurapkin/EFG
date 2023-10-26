@@ -1,9 +1,8 @@
 from helpers import B_matrix, search_nodes_in_domain
 from params import D
 import numpy as np
-from time import time
+import pandas as pd
 
-start = time()
 
 def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexes):
     size = len(nodes_in_domain)
