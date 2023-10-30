@@ -23,7 +23,7 @@ def B_matrix(q_point, nodes_in_domain):
         )
     )
 
-    return np.resize(B_vector, (3, len(nodes_in_domain)))
+    return B_vector
 
 def F_vector(q_point, nodes_in_domain):
     return F(q_point, nodes_in_domain)

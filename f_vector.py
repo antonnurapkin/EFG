@@ -52,4 +52,6 @@ def f_global(cells, n_x, n_y):
                 indexes = f_local_vector_n_indexes[:, 1]
                 f_global[indexes.astype(int), 0] += f_local_vector_n_indexes[:, 0]
 
+    print("Вектор сил сформирован")
+
     return f_global

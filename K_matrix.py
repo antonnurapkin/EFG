@@ -50,6 +50,8 @@ def K_global(cells, n_x, n_y):
                 index_2 = K_local_vector_n_indexes[:, 2]
                 K_global[index_1.astype(int), index_2.astype(int)] += K_local_vector_n_indexes[:, 0]
 
+    print("Матрица жесткости сформирована")
+
     return K_global
 
 # df = pd.DataFrame(K)

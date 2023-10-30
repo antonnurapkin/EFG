@@ -19,25 +19,26 @@ K = K_global(cells=cells, n_x=n_x, n_y=n_y)
 f = f_global(cells=cells, n_x=n_x, n_y=n_y)
 
 # Lagrange multiplyers
-G = G_global(cells=cells, n_x=n_x, n_y=n_y)
-G_T = np.transpose(G)
-E = np.zeros((G.shape[1], G.shape[1]))
-q = np.zeros((G.shape[1], 1))
-K_extend = np.block([[K, G], [G_T, E]])
-f_extend = np.block([[f], [q]])
+# G = G_global(cells=cells, n_x=n_x, n_y=n_y)
+# G_T = np.transpose(G)
+# E = np.zeros((G.shape[1], G.shape[1]))
+# q = np.zeros((G.shape[1], 1))
+# K_extend = np.block([[K, G], [G_T, E]])
+# f_extend = np.block([[f], [q]])
 
 # Penalty method
-# K_penalty = K_penalty_global(cells=cells, n_x=n_x, n_y=n_y)
-# K_extend = K + K_penalty
-# f_extend = f
+K_penalty = K_penalty_global(cells=cells, n_x=n_x, n_y=n_y)
+K_extend = K + K_penalty
+f_extend = f
+print("ГУ учтены")
 
 
 u = np.linalg.solve(K_extend, f_extend)
 U = get_displaments_array(cells, u[:f.shape[0]], n_x, n_y)
 
 # u = np.transpose(np.reshape(u[:f.shape[0]], (n_y, n_x)))
-# df = pd.DataFrame(U)
-# df.to_excel("U.xlsx")
+df = pd.DataFrame(U)
+df.to_excel("U.xlsx")
 
 
 fig = go.Figure()
