@@ -328,14 +328,16 @@ def create_Gauss_points_for_bound(cell):
 # Cоздание точек Гаусса
 def append_Gauss_points(all_cells):
     # По часовой стрелке
-    coords_gpoints_in_elem = [
-        [ -1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [ 1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [ 1 / np.sqrt(3), -1 / np.sqrt(3)],
-        [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
-    ]
+    # coords_gpoints_in_elem = [
+    #     [ -1 / np.sqrt(3), 1 / np.sqrt(3)],
+    #     [ 1 / np.sqrt(3), 1 / np.sqrt(3)],
+    #     [ 1 / np.sqrt(3), -1 / np.sqrt(3)],
+    #     [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
+    # ]
 
-    weight = 1
+    coords_gpoints_in_elem = [[0, 0]]
+
+    weight = 2
 
     for i in range(len(all_cells)):
         for j in range(len(all_cells[i])):
