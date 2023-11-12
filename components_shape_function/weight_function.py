@@ -48,8 +48,8 @@ def d2_weight_func(x, x_i):
     r = abs(x - x_i) / d_s
 
     if 0 <= r <= 0.5:
-        return (-8 + 24 * r) * np.sign(x - x_i) / (d_s ** 2) + (-8 + 24 * r) * 2 * Dirac_delta(x - x_i) / d_s
+        return (-8 + 24 * r) * np.sign(x - x_i) / (d_s ** 2) + (-8 * r + 12 * r ** 2) * 2 * Dirac_delta(x - x_i) / d_s
     elif 0.5 < r <= 1:
-        return (8 - 8 * r) * np.sign(x - x_i) / (d_s ** 2) + (8 - 8 * r) * 2 * Dirac_delta(x - x_i) / d_s
+        return (8 - 8 * r) * np.sign(x - x_i) / (d_s ** 2) + (-4 + 8 * r - 4 * r ** 2) * 2 * Dirac_delta(x - x_i) / d_s
     elif r > 1:
         return 0
