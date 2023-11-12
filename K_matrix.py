@@ -1,7 +1,6 @@
 from helpers import B_matrix, search_nodes_in_domain
 from params import D
 import numpy as np
-import pandas as pd
 
 
 def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexes):
@@ -27,13 +26,16 @@ def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexe
     return K_local_vector_n_indexes
 
 
-def K_global(cells, n_x, n_y):
+def K_global(cells, n_x, n_y, nodes, coords):
     K_global = np.zeros((n_x * n_y, n_x * n_y))
 
     for i in range(len(cells)):
         for j in range(len(cells[i])):
             for point in cells[i][j].gauss_points:
-                nodes_in_domain, global_indexes = search_nodes_in_domain(q_point=point, current_cell=cells[i][j])
+                global_indexes = search_nodes_in_domain(q_point=point, coords=coords)
+
+                nodes_in_domain = nodes[global_indexes.astype(int)]
+
                 B = B_matrix(q_point=point, nodes_in_domain=nodes_in_domain)
 
                 # Создание матрицы K
@@ -53,64 +55,3 @@ def K_global(cells, n_x, n_y):
     print("Матрица жесткости сформирована")
 
     return K_global
-
-# df = pd.DataFrame(K)
-# df.to_excel("K_1.xlsx")
-
-#
-# global_indexes = []
-# all_nodes = []
-# for row in cells:
-#     for cell in row:
-#         for node in cell.nodes:
-#             if len(global_indexes) == 0:
-#                 global_indexes.append(node.global_index)
-#                 all_nodes.append(node)
-#             elif len(global_indexes) > 0 and node.global_index not in global_indexes:
-#                 global_indexes.append(node.global_index)
-#                 all_nodes.append(node)
-#
-# # Создание вектора f
-# B =
-# f_local_vector_n_indexes = create_f_vector(
-#     all_nodes,
-#     B,
-#     b,
-#     1,
-#     cells[0][0].jacobian,
-#     global_indexes
-# )
-#
-# f_global = f_global_assemble(f_global, f_local_vector_n_indexes)
-
-# x_gp = []
-# y_gp = []
-#
-# x_n = []
-# y_n = []
-#
-#
-# for row in cells:
-#     for cell in row:
-#         for point in cell.gauss_points:
-#             x_gp.append(point.x)
-#             y_gp.append(point.y)
-#
-#         for node in cell.nodes:
-#
-#
-# z = np.zeros((n_y, n_x))
-#
-# k = 0
-# for i in range(n_x):
-#     for j in range(n_y):
-#         z[j, i] = f[k]
-#         k += 1
-#
-# fig = go.Figure(data=
-#     go.Contour(
-#         z=z,
-#         x=[0.0, 0.25, 0.5, 0.75, 0.5],
-#         y=[0.0, 0.25, 0.5, 0.75, 0.5]
-#     ))
-# fig.show()

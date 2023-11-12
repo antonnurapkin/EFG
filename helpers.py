@@ -29,28 +29,20 @@ def F_vector(q_point, nodes_in_domain):
     return F(q_point, nodes_in_domain)
 
 
-def search_nodes_in_domain(current_cell: Cell, q_point: Point):
-    nodes_in_domain = []
-    all_interested_cells = current_cell.neighbors
-    all_interested_cells.append(current_cell)
+def search_nodes_in_domain(coords , q_point):
 
     global_indexes = np.array([])
 
-    # Просмотр соседей
-    for neighbor in all_interested_cells:
-        # nei_x = neighbor.x
-        # nei_y = neighbor.y
-        for node in neighbor.nodes:
-            r_x, r_y = calculate_r(point=q_point, node=node, ds_x=ds_x, ds_y=ds_y)
-            if r_x <= 1 and r_y <= 1:
-                if len(global_indexes) == 0:
-                    global_indexes = np.append(global_indexes, node.global_index)
-                    nodes_in_domain.append(node)
-                elif len(global_indexes) > 0 and node.global_index not in global_indexes:
-                    global_indexes = np.append(global_indexes, node.global_index)
-                    nodes_in_domain.append(node)
+    q_point_array = [[q_point.x], [q_point.y]] * np.ones(coords.shape)
 
-    return nodes_in_domain, global_indexes
+    r_array = np.absolute(coords - q_point_array) * [[1 / ds_x], [1 / ds_y]]
+
+    for i in range(len(r_array[0])):
+        r_x, r_y = r_array[0][i], r_array[1][i]
+        if r_x <= 1 and r_y <= 1:
+            global_indexes = np.append(global_indexes, i)
+
+    return global_indexes
 
 
 def delete_duplicates(arr):

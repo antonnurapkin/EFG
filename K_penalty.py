@@ -1,4 +1,4 @@
-from helpers import B_matrix, search_nodes_in_domain, get_bound_elems, create_s_matrix, indexes_for_bound_nodes
+from helpers import search_nodes_in_domain, get_bound_elems, indexes_for_bound_nodes
 from shape_function import F
 from params import D, penalty_alpha
 import numpy as np
@@ -25,7 +25,7 @@ def create_K_penalty_nodal_vector(F, D, nodes_in_domain, weight, jacobian, globa
     return K_local_vector_n_indexes
 
 
-def create_K_penalty_global(bound_cells, indexes, n_x, n_y):
+def create_K_penalty_global(bound_cells, indexes, n_x, n_y, nodes, coords):
     K_penalty = np.zeros((n_x * n_y, n_x * n_y))
 
     index_node = 0
@@ -47,7 +47,9 @@ def create_K_penalty_global(bound_cells, indexes, n_x, n_y):
             index_cell = 0
 
         for point in bound_cells[index_cell].boundary_Gauss_points[:4]:
-            nodes_in_domain, global_indexes = search_nodes_in_domain(q_point=point, current_cell=bound_cells[index_cell])
+            global_indexes = search_nodes_in_domain(q_point=point, coords=coords)
+
+            nodes_in_domain = nodes[global_indexes.astype(int)]
 
             F_array = F(point, nodes_in_domain)
 
@@ -93,15 +95,15 @@ def create_K_penalty_global(bound_cells, indexes, n_x, n_y):
     return K_penalty
 
 
-def K_penalty_global(cells, n_x, n_y):
-    indexes = indexes_for_bound_nodes(n_x, n_y)
-    bound_cells = get_bound_elems(cells)
+def K_penalty_global(cells, n_x, n_y, nodes, coords):
+    indexes = indexes_for_bound_nodes(n_x=n_x, n_y=n_y)
+    bound_cells = get_bound_elems(cells=cells)
 
-
-    # for cell in bound_cells:
-    #     print("cells's coords:", cell.x, cell.y)
-    #     for neighbor in cell.neighbors:
-    #         print(neighbor.x, neighbor.y, end=", ")
-    #     print("\n")
-
-    return create_K_penalty_global(bound_cells, indexes, n_x, n_y)
+    return create_K_penalty_global(
+        bound_cells=bound_cells,
+        indexes=indexes,
+        n_x=n_x,
+        n_y=n_y,
+        nodes=nodes,
+        coords=coords
+    )

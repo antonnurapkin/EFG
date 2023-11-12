@@ -1,7 +1,5 @@
 import numpy as np
-from plotly import graph_objects as go
-import plotly.express as px
-from params import n_x, n_y, elem_x, elem_y, step_x, step_y, l_x, l_y
+from params import n_y, elem_x, elem_y, step_x, step_y, l_x, l_y
 
 
 # Класс для клетки
@@ -17,25 +15,6 @@ class Cell:
         self.jacobian = self.w * self.h / 4
         self.boundary_Gauss_points = None
 
-        # Создаются в процессе при необходимости
-        # self.left_bound_gauss_points = None
-        # self.right_bound_gauss_points = None
-        # self.top_bound_gauss_points = None
-        # self.bottom_bound_gauss_points = None
-
-
-# Класс для узла
-class Node:
-    def __init__(self, x, y, local_index):
-        self.x = x
-        self.y = y
-        self.z = 0
-
-        self.z_solve = None
-        self.local_index = local_index
-        self.global_index = None
-        self.calculated_displ = False
-
 
 # Класс для точки Гаусса
 class Point:
@@ -43,135 +22,6 @@ class Point:
         self.x = x
         self.y = y
         self.weight = weight
-
-
-# Создание списков соседей
-def append_neighbors(all_cells):
-    for i in range(len(all_cells)):
-        for j in range(len(all_cells[i])):
-            # Верхня граница
-            if i == 0:
-                if j == 0:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j + 1],
-                            all_cells[i][j + 1]
-                        ]
-                    )
-                elif j == len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j - 1],
-                            all_cells[i][j - 1]
-                        ]
-                    )
-                elif 0 < j < len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i][j - 1],
-                            all_cells[i + 1][j - 1],
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j + 1],
-                            all_cells[i][j + 1],
-                        ]
-                    )
-                
-            elif 0 < i < len(all_cells) - 1: 
-                if j == 0:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i - 1][j],
-                            all_cells[i - 1][j + 1],
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j + 1],
-                            all_cells[i][j + 1],
-                        ]
-                    )
-                
-                elif 0 < j < len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i - 1][j - 1],
-                            all_cells[i - 1][j],
-                            all_cells[i - 1][j + 1],
-                            all_cells[i][j - 1],
-                            all_cells[i][j + 1],
-                            all_cells[i + 1][j - 1],
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j + 1],
-                        ]
-                    )
-                elif j == len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i + 1][j],
-                            all_cells[i + 1][j - 1],
-                            all_cells[i][j - 1],
-                            all_cells[i - 1][j - 1],
-                            all_cells[i - 1][j],
-                        ]
-                )
-            elif i == len(all_cells) - 1:
-                if j == 0:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i - 1][j],
-                            all_cells[i - 1][j + 1],
-                            all_cells[i][j + 1]
-                        ]
-                    )
-                    
-                elif j == len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i - 1][j],
-                            all_cells[i - 1][j - 1],
-                            all_cells[i][j - 1]
-                        ]
-                    )
-                elif 0 < j < len(all_cells[i]) - 1:
-                    all_cells[i][j].neighbors.extend(
-                        [
-                            all_cells[i][j - 1],
-                            all_cells[i - 1][j - 1],
-                            all_cells[i - 1][j],
-                            all_cells[i - 1][j + 1],
-                            all_cells[i][j + 1],
-                        ]
-                    )  
-        
-    return all_cells
-
-
-# Создание узлов
-def append_nodes(all_cells):
-    for row in all_cells:
-        for cell in row:
-
-            cell.nodes.extend(
-                [
-                    Node(x=cell.x, y=cell.y, local_index=1),
-                    Node(x=cell.x + cell.w, y=cell.y, local_index=2),
-                    Node(x=cell.x + cell.w, y=cell.y + cell.h, local_index=3),
-                    Node(x=cell.x, y=cell.y + cell.h, local_index=4)
-                ]
-            )
-
-    return all_cells
-
-
-# Глобальная индексация узлов
-def global_indexes_for_nodes(all_cells):
-    for j in range(elem_y):
-        for i in range(elem_x):
-            all_cells[j][i].nodes[0].global_index = i * n_y + j
-            all_cells[j][i].nodes[1].global_index = (i + 1) * n_y + j 
-            all_cells[j][i].nodes[2].global_index = (i + 1) * n_y + j + 1
-            all_cells[j][i].nodes[3].global_index = i * n_y + j + 1
-
-    return all_cells
 
 
 # Функции для определения точек Гаусса внутри клетки
@@ -328,16 +178,16 @@ def create_Gauss_points_for_bound(cell):
 # Cоздание точек Гаусса
 def append_Gauss_points(all_cells):
     # По часовой стрелке
-    # coords_gpoints_in_elem = [
-    #     [ -1 / np.sqrt(3), 1 / np.sqrt(3)],
-    #     [ 1 / np.sqrt(3), 1 / np.sqrt(3)],
-    #     [ 1 / np.sqrt(3), -1 / np.sqrt(3)],
-    #     [ -1 / np.sqrt(3), -1 / np.sqrt(3)]
-    # ]
+    coords_gpoints_in_elem = [
+        [-1 / np.sqrt(3), 1 / np.sqrt(3)],
+        [1 / np.sqrt(3), 1 / np.sqrt(3)],
+        [1 / np.sqrt(3), -1 / np.sqrt(3)],
+        [-1 / np.sqrt(3), -1 / np.sqrt(3)]
+    ]
 
-    coords_gpoints_in_elem = [[0, 0]]
-
-    weight = 2
+    # coords_gpoints_in_elem = [[0, 0]]
+    #
+    weight = 1
 
     for i in range(len(all_cells)):
         for j in range(len(all_cells[i])):
@@ -357,21 +207,23 @@ def append_Gauss_points(all_cells):
             
 
 # Создание ячеек
-def create_cells(n_x, n_y, l_x, l_y):
+def create_cells(elems_x, elems_y, l_x, l_y):
 
     all_cells = []
 
     # TODO: Заменить на генератор
-    for i in range(0, n_y - 1):
+    for i in range(0, elems_y):
         row = []
-        for j in range(0, n_x - 1):
+        for j in range(0, elems_x):
             row.append(Cell(x=j * step_x, y=i * step_y))
         all_cells.append(row)
 
-    all_cells = append_neighbors(all_cells=all_cells)
-    all_cells = append_nodes(all_cells=all_cells)
+    # all_cells = append_neighbors(all_cells=all_cells)
+    # all_cells = append_nodes(all_cells=all_cells)
     all_cells = append_Gauss_points(all_cells=all_cells)
-    all_cells = global_indexes_for_nodes(all_cells=all_cells)
+    # all_cells = global_indexes_for_nodes(all_cells=all_cells)
+
+    print("Сетка создана")
 
     return np.array(all_cells, dtype="object")
 

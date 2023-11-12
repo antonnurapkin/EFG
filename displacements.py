@@ -3,14 +3,12 @@ from shape_function import F
 import numpy as np
 
 
-def set_solve_results(cells, u):
-    for row in cells:
-        for cell in row:
-            for node in cell.nodes:
-                if node.z_solve is None:
-                    node.z_solve = u[node.global_index]
+def write_solve_results(nodes, u):
+    for i in range(len(nodes)):
+        if nodes[i].z_solve is None:
+            nodes[i].z_solve = u[i]
 
-    return cells
+    return nodes
 
 
 def calculate_nodal_displacement(F, nodes):
@@ -21,39 +19,32 @@ def calculate_nodal_displacement(F, nodes):
     return u
 
 
-def calculate_real_displacements(cells):
-    for row in cells:
-        for cell in row:
-            for node in cell.nodes:
-                if node.calculated_displ is False:
-                    nodes_in_domain, global_indexes = search_nodes_in_domain(cell, node)
-                    F_array = F(node, nodes_in_domain)
+def calculate_real_displacements(nodes, coords):
+    for node in nodes:
+        global_indexes = search_nodes_in_domain(q_point=node, coords=coords)
 
-                    node.z = calculate_nodal_displacement(F_array, nodes_in_domain)
+        nodes_in_domain = nodes[global_indexes.astype(int)]
+        F_array = F(node, nodes_in_domain)
+        node.z = calculate_nodal_displacement(F_array, nodes_in_domain)
 
-    return cells
+    return nodes
 
 
-def create_U_array(cells, n_x, n_y):
+def create_U_array(nodes, n_x, n_y):
 
-    added_indexes = []
+    U = []
 
-    U = np.zeros((n_y * n_x, 1))
-    for i in range(len(cells[0])):
-        for j in range(len(cells)):
-            for node in cells[j][i].nodes:
-                if node.global_index not in added_indexes:
-                    U[node.global_index] = node.z
-                    added_indexes.append(node.global_index)
+    for node in nodes:
+        U.append(node.z)
 
-    return np.transpose(np.reshape(U, (n_y, n_x)))
+    return np.transpose(np.reshape(np.array(U), (n_y, n_x)))
 
 
-def get_displaments_array(cells, u, n_x, n_y):
+def get_displaments_array(nodes, u, n_x, n_y, coords):
 
-    cells = set_solve_results(cells=cells, u=u)
-    cells = calculate_real_displacements(cells=cells)
-    U = create_U_array(cells, n_x, n_y)
+    nodes = write_solve_results(nodes=nodes, u=u)
+    nodes = calculate_real_displacements(nodes=nodes, coords=coords)
+    U = create_U_array(nodes=nodes, n_x=n_x, n_y=n_y)
     return U
 
 
