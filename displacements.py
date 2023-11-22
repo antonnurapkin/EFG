@@ -1,4 +1,6 @@
 from helpers import search_nodes_in_domain
+from components_shape_function.radius import calculate_r, r_derivatives
+from components_shape_function.weight_function import weight_func_array
 from shape_function import F
 import numpy as np
 
@@ -21,10 +23,15 @@ def calculate_nodal_displacement(F, nodes):
 
 def calculate_real_displacements(nodes, coords):
     for node in nodes:
-        global_indexes = search_nodes_in_domain(q_point=node, coords=coords)
+        r_array = calculate_r(q_point=node, coords=coords)
+        global_indexes = search_nodes_in_domain(r_array=r_array)
 
         nodes_in_domain = nodes[global_indexes.astype(int)]
-        F_array = F(node, nodes_in_domain)
+
+        drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, node)
+        w = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)[0]
+
+        F_array = F(node, nodes_in_domain, w)
         node.z = calculate_nodal_displacement(F_array, nodes_in_domain)
 
     return nodes

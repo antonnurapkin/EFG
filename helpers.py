@@ -1,25 +1,21 @@
 import numpy as np
 
-from meshing import Cell, Point
-from params import ds_x, ds_y
-
 from shape_function import d2Fdx2, d2Fdy2, d2Fdydx, F
+from components_shape_function.weight_function import weight_func_array
+from components_shape_function.radius import r_derivatives
+from params import WEIGHT_FUNCTION_TYPE
 
 
-def calculate_r(point, node, ds_x, ds_y):
-    r_x = abs(point.x - node.x) / ds_x
-    r_y = abs(point.y - node.y) / ds_y
+def B_matrix(q_point, nodes_in_domain, r_array, coords):
+    drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, q_point)
 
-    return r_x, r_y
-
-
-def B_matrix(q_point, nodes_in_domain):
+    w, dwdx, dwdy, d2wdx2, dw2dy2, dw2dxdy = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)
 
     B_vector = np.vstack(
         (
-            -d2Fdx2(q_point, nodes_in_domain),
-            -d2Fdy2(q_point, nodes_in_domain),
-            -2 * d2Fdydx(q_point, nodes_in_domain)
+            -d2Fdx2(q_point, nodes_in_domain, w, dwdx, d2wdx2),
+            -d2Fdy2(q_point, nodes_in_domain, w, dwdy, dw2dy2),
+            -2 * d2Fdydx(q_point, nodes_in_domain, w, dwdx, dwdy, dw2dxdy)
         )
     )
 
@@ -29,18 +25,14 @@ def F_vector(q_point, nodes_in_domain):
     return F(q_point, nodes_in_domain)
 
 
-def search_nodes_in_domain(coords , q_point):
+def search_nodes_in_domain(r_array):
 
     global_indexes = np.array([])
 
-    q_point_array = [[q_point.x], [q_point.y]] * np.ones(coords.shape)
-
-    r_array = np.absolute(coords - q_point_array) * [[1 / ds_x], [1 / ds_y]]
-
-    for i in range(len(r_array[0])):
-        r_x, r_y = r_array[0][i], r_array[1][i]
-        if r_x <= 1 and r_y <= 1:
-            global_indexes = np.append(global_indexes, i)
+    if WEIGHT_FUNCTION_TYPE == "quadratic":
+        for i in range(len(r_array)):
+            if r_array[i] <= 1:
+                global_indexes = np.append(global_indexes, i)
 
     return global_indexes
 

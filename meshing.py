@@ -178,16 +178,16 @@ def create_Gauss_points_for_bound(cell):
 # Cоздание точек Гаусса
 def append_Gauss_points(all_cells):
     # По часовой стрелке
-    coords_gpoints_in_elem = [
-        [-1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [1 / np.sqrt(3), -1 / np.sqrt(3)],
-        [-1 / np.sqrt(3), -1 / np.sqrt(3)]
-    ]
+    # coords_gpoints_in_elem = [
+    #     [-1 / np.sqrt(3), 1 / np.sqrt(3)],
+    #     [1 / np.sqrt(3), 1 / np.sqrt(3)],
+    #     [1 / np.sqrt(3), -1 / np.sqrt(3)],
+    #     [-1 / np.sqrt(3), -1 / np.sqrt(3)]
+    # ]
 
-    # coords_gpoints_in_elem = [[0, 0]]
-    #
-    weight = 1
+    coords_gpoints_in_elem = [[0, 0]]
+
+    weight = 2
 
     for i in range(len(all_cells)):
         for j in range(len(all_cells[i])):
@@ -218,10 +218,8 @@ def create_cells(elems_x, elems_y, l_x, l_y):
             row.append(Cell(x=j * step_x, y=i * step_y))
         all_cells.append(row)
 
-    # all_cells = append_neighbors(all_cells=all_cells)
-    # all_cells = append_nodes(all_cells=all_cells)
+
     all_cells = append_Gauss_points(all_cells=all_cells)
-    # all_cells = global_indexes_for_nodes(all_cells=all_cells)
 
     print("Сетка создана")
 
