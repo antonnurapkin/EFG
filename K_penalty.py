@@ -1,4 +1,6 @@
 from helpers import search_nodes_in_domain, get_bound_elems, indexes_for_bound_nodes
+from components_shape_function.radius import calculate_r, r_derivatives
+from components_shape_function.weight_function import weight_func_array
 from shape_function import F
 from params import D, penalty_alpha
 import numpy as np
@@ -47,11 +49,16 @@ def create_K_penalty_global(bound_cells, indexes, n_x, n_y, nodes, coords):
             index_cell = 0
 
         for point in bound_cells[index_cell].boundary_Gauss_points[:4]:
-            global_indexes = search_nodes_in_domain(q_point=point, coords=coords)
+
+            r_array = calculate_r(q_point=point, coords=coords)
+            global_indexes = search_nodes_in_domain(r_array=r_array)
 
             nodes_in_domain = nodes[global_indexes.astype(int)]
 
-            F_array = F(point, nodes_in_domain)
+            drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, point)
+            w = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)[0]
+
+            F_array = F(point, nodes_in_domain, w)
 
             # Создание матрицы K
             K_local_vector_n_indexes = create_K_penalty_nodal_vector(

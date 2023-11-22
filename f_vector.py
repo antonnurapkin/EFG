@@ -1,5 +1,8 @@
 import numpy as np
-from helpers import search_nodes_in_domain, F_vector
+from helpers import search_nodes_in_domain
+from components_shape_function.radius import calculate_r, r_derivatives
+from components_shape_function.weight_function import weight_func_array
+from shape_function import F
 from params import b, THICKNESS
 
 def create_f_vector(F, b, nodes_in_domain, weight, jacobian, global_indexes):
@@ -20,14 +23,6 @@ def create_f_vector(F, b, nodes_in_domain, weight, jacobian, global_indexes):
 
     return f_local_vector_n_index
 
-
-def f_global_assemble(f_global, f_local_vector_n_indexes):
-    for elem in f_local_vector_n_indexes:
-        f_global[int(elem[1])] += elem[0]
-
-    return f_global
-
-
 def f_global(cells, n_x, n_y, nodes, coords):
 
     f_global = np.zeros((n_x * n_y, 1))
@@ -35,15 +30,18 @@ def f_global(cells, n_x, n_y, nodes, coords):
     for i in range(len(cells)):
         for j in range(len(cells[i])):
             for point in cells[i][j].gauss_points:
-
-                global_indexes = search_nodes_in_domain(q_point=point, coords=coords)
+                r_array = calculate_r(q_point=point, coords=coords)
+                global_indexes = search_nodes_in_domain(r_array=r_array)
 
                 nodes_in_domain = nodes[global_indexes.astype(int)]
 
-                F = F_vector(q_point=point, nodes_in_domain=nodes_in_domain)
+                drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, point)
+                w = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)[0]
+
+                F_array = F(point, nodes_in_domain, w)
 
                 f_local_vector_n_indexes = create_f_vector(
-                    F,
+                    F_array,
                     b,
                     nodes_in_domain,
                     point.weight,

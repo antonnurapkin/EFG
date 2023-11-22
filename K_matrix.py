@@ -1,4 +1,5 @@
 from helpers import B_matrix, search_nodes_in_domain
+from components_shape_function.radius import calculate_r
 from params import D
 import numpy as np
 
@@ -32,11 +33,13 @@ def K_global(cells, n_x, n_y, nodes, coords):
     for i in range(len(cells)):
         for j in range(len(cells[i])):
             for point in cells[i][j].gauss_points:
-                global_indexes = search_nodes_in_domain(q_point=point, coords=coords)
+
+                r_array = calculate_r(q_point=point, coords=coords)
+                global_indexes = search_nodes_in_domain(r_array=r_array)
 
                 nodes_in_domain = nodes[global_indexes.astype(int)]
 
-                B = B_matrix(q_point=point, nodes_in_domain=nodes_in_domain)
+                B = B_matrix(q_point=point, nodes_in_domain=nodes_in_domain, r_array=r_array, coords=coords)
 
                 # Создание матрицы K
                 K_local_vector_n_indexes = create_K_nodal_vector(
