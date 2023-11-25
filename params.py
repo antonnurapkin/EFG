@@ -53,4 +53,4 @@ penalty_alpha = 10e6 * E
 WEIGHT_FUNCTION_TYPE = "quadratic"
 
 '''ПАРАМЕТРЫ НАГРУЖЕНИЯ'''
-b = np.array([[0], [0], [-5e6]])
+b = np.array([[0], [0], [-50e6]])

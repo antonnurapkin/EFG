@@ -1,4 +1,4 @@
-from params import b, l_x, l_y, THICKNESS, D_init_const
+from params import b, l_x, l_y, THICKNESS, D_init_const, E
 import numpy as np
 
 
@@ -12,9 +12,10 @@ def w(x, y):
 
     for m in range(1, M + 1):
         for n in range(1, N + 1):
-            divider = m * n * (m ** 2 / l_x ** 2 + n ** 2 / l_y ** 2) ** 2
-            series += np.sin(m * np.pi * x / l_x) * np.sin(n * np.pi * y / l_y) / divider
+            divider = m * n * ((m ** 2) / (l_x ** 2) + (n ** 2) / (l_y ** 2)) ** 2
+            series += np.sin((m * np.pi * x) / l_x) * np.sin((n * np.pi * y) / l_y) / divider
 
     return coef * series
 
 print(w(x=l_x / 2, y=l_y / 2))
+
