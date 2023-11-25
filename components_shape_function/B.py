@@ -1,4 +1,3 @@
-from components_shape_function.weight_function_first import d_weight_func, weight_func, d2_weight_func
 from components_shape_function.p import p
 import numpy as np
 

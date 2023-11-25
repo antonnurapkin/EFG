@@ -3,7 +3,9 @@ from helpers import search_nodes_in_domain
 from components_shape_function.radius import calculate_r, r_derivatives
 from components_shape_function.weight_function import weight_func_array
 from shape_function import F
-from params import b, THICKNESS
+from params import b, THICKNESS, l_x, l_y, elem_x, elem_y
+from plotly import graph_objects as go
+
 
 def create_f_vector(F, b, nodes_in_domain, weight, jacobian, global_indexes):
     size = len(nodes_in_domain)
