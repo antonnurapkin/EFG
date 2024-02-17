@@ -1,44 +1,32 @@
 import numpy as np
 from plotly import graph_objects as go
 
-from matrices.K_matrix import K_global
-from matrices.f_vector import f_global
-from matrices.K_penalty import K_penalty_global
-from meshing import create_cells
-from params import n_x, n_y, l_x, l_y, elem_x, elem_y, step_x, step_y
-from displacements import get_displaments_array
-from nodes import create_nodes, get_coords_array
+from nodes import create_nodes, get_nodes_coords
+from integration_points import create_integration_points
 
 
-cells = create_cells(elems_x=elem_x, elems_y=elem_y, l_x=l_x, l_y=l_y)
-nodes = create_nodes(n_x=n_x, n_y=n_y, step_x=step_x, step_y=step_y)
-nodes_coords = get_coords_array(nodes=nodes)
+a = 1
+b = 1
+r0 = a / 4
 
-K = K_global(cells=cells, n_x=n_x, n_y=n_y, nodes=nodes, coords=nodes_coords)
-f = f_global(cells=cells, n_x=n_x, n_y=n_y, nodes=nodes, coords=nodes_coords)
+nodes_number = 4
+elems = nodes_number - 1
 
-# Lagrange multiplyers
-# G = G_global(cells=cells, n_x=n_x, n_y=n_y)
-# G_T = np.transpose(G)
-# E = np.zeros((G.shape[1], G.shape[1]))
-# q = np.zeros((G.shape[1], 1))
-# K_extend = np.block([[K, G], [G_T, E]])
-# f_extend = np.block([[f], [q]])
+fi_delta = np.pi / (2 * (elems * 2))
+nodes = create_nodes(nodes_number=nodes_number, a=a, b=b, fi_delta=fi_delta, r0=r0)
+nodes_coords = get_nodes_coords(nodes=nodes)
+integration_points = create_integration_points(nodes_coords=nodes_coords, nodes_number=nodes_number)
 
-# Penalty method
-K_penalty = K_penalty_global(cells=cells, n_x=n_x, n_y=n_y, nodes=nodes, coords=nodes_coords)
-K_extend = K + K_penalty
-f_extend = f
-print("ГУ учтены")
 
-u = np.linalg.solve(K_extend, f_extend)
-print("Решение получено")
-U = get_displaments_array(nodes=nodes, u=u[:f.shape[0]], n_x=n_x, n_y=n_y, coords=nodes_coords)
-# u = np.transpose(np.reshape(u[:f.shape[0]], (n_y, n_x)))
+points = []
+for point in integration_points:
+    points.append([point.x, point.y])
+
+points = np.array(points)
+
+indexes = [str(node.global_index) for node in nodes]
 
 fig = go.Figure()
-fig.add_trace(
-    go.Surface(z=np.transpose(np.reshape(f_extend[:f.shape[0]], (n_y, n_x))), x=np.arange(0, l_x + l_x / elem_x, l_x / elem_x), y=np.arange(0, l_y + l_y / elem_y, l_y / elem_y))
-)
-
+fig.add_trace(go.Scatter(x=points[:, 0], y=points[:, 1], mode='markers'))
+fig.add_trace(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode='markers', text=indexes))
 fig.show()

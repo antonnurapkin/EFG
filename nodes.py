@@ -1,34 +1,75 @@
 import numpy as np
+from helpers import get_x_coord,get_y_coord
 
 
 class Node:
     def __init__(self, x, y, global_index):
         self.x = x
         self.y = y
-        self.z = 0
-
-        self.z_solve = None
         self.global_index = global_index
 
 
-def create_nodes(n_x, n_y, step_x, step_y):
+def create_nodes(nodes_number, a, b, fi_delta, r0):
+
     nodes = []
-    global_index = 0
-    for i in range(n_x):
-        for j in range(n_y):
-            nodes.append(Node(x=step_x * i, y=step_y * j, global_index=global_index))
+    global_index = 1
+
+    # Вертикальная граница
+    for i in range(nodes_number):
+        x_left_bound = a
+        y_left_bound = i * (b / (nodes_number - 1))
+        fi_current = fi_delta * i
+
+        distance = np.sqrt((x_left_bound - get_x_coord(r0, fi_current)) ** 2 + (y_left_bound - get_y_coord(r0, fi_current)) ** 2)
+        r_delta = distance / (nodes_number - 1)
+
+        for j in range(nodes_number):
+
+            if j == nodes_number - 1:
+                x_coord = x_left_bound
+            else:
+                x_coord = get_x_coord(r_delta * j + r0, fi_current)
+
+            y_coord = get_y_coord(r_delta * j + r0, fi_current)
+
+            nodes.append(Node(x_coord, y_coord, global_index))
+            global_index += 1
+
+    fi_middle = fi_current
+
+    # Горизонтальная граница
+    for i in range(nodes_number - 1):
+        x_top_bound = a - (i + 1) * (a / (nodes_number - 1))
+        y_top_bound = b
+        fi_current = fi_delta * (i + 1) + fi_middle
+
+        distance = np.sqrt((x_top_bound - get_x_coord(r0, fi_current)) ** 2 + (y_top_bound - get_y_coord(r0, fi_current)) ** 2)
+        r_delta = distance / (nodes_number - 1)
+
+        for j in range(nodes_number):
+
+            if j == nodes_number - 1:
+                y_coord = y_top_bound
+            else:
+                y_coord = get_y_coord(r_delta * j + r0, fi_current)
+
+            x_coord = get_x_coord(r_delta * j + r0, fi_current)
+
+            nodes.append(Node(x_coord, y_coord, global_index))
             global_index += 1
 
     print("Узлы созданы")
 
-    return np.array(nodes, dtype="object")
+    return nodes
 
 
-def get_coords_array(nodes):
+def get_nodes_coords(nodes):
     coords = np.empty((2, 0))
 
     for node in nodes:
         coords = np.append(arr=coords, values=[[node.x], [node.y]], axis=1)
+
+    print("Получены координаты узлов")
 
     return coords
 
