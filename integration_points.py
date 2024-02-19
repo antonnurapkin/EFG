@@ -71,6 +71,6 @@ def create_integration_points(nodes_coords, nodes_number):
                     ]
                 )
 
-    print("Точки интегрирования созданы")
+    print("Точки интегрирования созданы...")
 
     return integration_points

@@ -11,7 +11,7 @@ class Node:
 
 def create_nodes(nodes_number, a, b, fi_delta, r0):
 
-    nodes = []
+    nodes = np.array([])
     global_index = 1
 
     # Вертикальная граница
@@ -32,7 +32,7 @@ def create_nodes(nodes_number, a, b, fi_delta, r0):
 
             y_coord = get_y_coord(r_delta * j + r0, fi_current)
 
-            nodes.append(Node(x_coord, y_coord, global_index))
+            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
             global_index += 1
 
     fi_middle = fi_current
@@ -55,10 +55,10 @@ def create_nodes(nodes_number, a, b, fi_delta, r0):
 
             x_coord = get_x_coord(r_delta * j + r0, fi_current)
 
-            nodes.append(Node(x_coord, y_coord, global_index))
+            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
             global_index += 1
 
-    print("Узлы созданы")
+    print("Узлы созданы...")
 
     return nodes
 
@@ -69,7 +69,7 @@ def get_nodes_coords(nodes):
     for node in nodes:
         coords = np.append(arr=coords, values=[[node.x], [node.y]], axis=1)
 
-    print("Получены координаты узлов")
+    print("Получены координаты узлов...")
 
     return coords
 

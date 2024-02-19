@@ -3,6 +3,7 @@ from plotly import graph_objects as go
 
 from nodes import create_nodes, get_nodes_coords
 from integration_points import create_integration_points
+from matrices.K_matrix import K_global
 
 
 a = 1
@@ -17,16 +18,19 @@ nodes = create_nodes(nodes_number=nodes_number, a=a, b=b, fi_delta=fi_delta, r0=
 nodes_coords = get_nodes_coords(nodes=nodes)
 integration_points = create_integration_points(nodes_coords=nodes_coords, nodes_number=nodes_number)
 
+K_global = K_global(integration_points=integration_points, nodes=nodes, nodes_coords=nodes_coords)
 
-points = []
-for point in integration_points:
-    points.append([point.x, point.y])
 
-points = np.array(points)
 
-indexes = [str(node.global_index) for node in nodes]
-
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=points[:, 0], y=points[:, 1], mode='markers'))
-fig.add_trace(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode='markers', text=indexes))
-fig.show()
+# points = []
+# for point in integration_points:
+#     points.append([point.x, point.y])
+#
+# points = np.array(points)
+#
+# indexes = [str(node.global_index) for node in nodes]
+#
+# fig = go.Figure()
+# fig.add_trace(go.Scatter(x=points[:, 0], y=points[:, 1], mode='markers'))
+# fig.add_trace(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode='markers', text=indexes))
+# fig.show()

@@ -1,38 +1,37 @@
 import numpy as np
 
-from shape_function import d2Fdx2, d2Fdy2, d2Fdydx, F
+from shape_function import dFdx, dFdy, F
 from components_shape_function.weight_function import weight_func_array
 from components_shape_function.radius import r_derivatives
-from params import WEIGHT_FUNCTION_TYPE
 
 
-def B_matrix(q_point, nodes_in_domain, r_array, coords):
-    drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, q_point)
+def F_array(q_point, nodes_in_domain, r_array, coords):
+    drdx, drdy = r_derivatives(r_array, coords, q_point)
 
-    w, dwdx, dwdy, d2wdx2, dw2dy2, dw2dxdy = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)
+    w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
 
-    B_vector = np.vstack(
-        (
-            -d2Fdx2(q_point, nodes_in_domain, w, dwdx, d2wdx2),
-            -d2Fdy2(q_point, nodes_in_domain, w, dwdy, dw2dy2),
-            -2 * d2Fdydx(q_point, nodes_in_domain, w, dwdx, dwdy, dw2dxdy)
-        )
-    )
+    F = np.vstack([
+        dFdx(q_point, nodes_in_domain, w, dwdy),
+        dFdy(q_point, nodes_in_domain, w, dwdx)
+    ])
 
-    return B_vector
+    return F
 
-def F_vector(q_point, nodes_in_domain):
-    return F(q_point, nodes_in_domain)
 
+def B_matrix(F_i):
+    B = np.array([[F_i[0], 0],
+                  [0, F_i[0]],
+                  [F_i[0], F_i[1]]])
+
+    return B
 
 def search_nodes_in_domain(r_array):
 
     global_indexes = np.array([])
 
-    if WEIGHT_FUNCTION_TYPE == "quadratic":
-        for i in range(len(r_array)):
-            if r_array[i] <= 1:
-                global_indexes = np.append(global_indexes, i)
+    for i in range(len(r_array)):
+        if r_array[i] <= 1:
+            global_indexes = np.append(global_indexes, i)
 
     return global_indexes
 
@@ -74,7 +73,14 @@ def create_s_matrix(cells, indexes):
             for node in cells[i][j].nodes:
                 if node.global_index in indexes[:, 0]:
                     insert_index = np.where(indexes[:, 0] == node.global_index)[0][0]
-                    s[0][insert_index] = node.x
-                    s[1][insert_index] = node.y
+                    s[0][insert_index] = node.get_x_coord
+                    s[1][insert_index] = node.get_y_coord
 
     return s
+
+
+def get_x_coord(r, fi):
+    return r * np.cos(fi)
+
+def get_y_coord(r, fi):
+    return r * np.sin(fi)

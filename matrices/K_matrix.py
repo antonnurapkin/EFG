@@ -1,60 +1,38 @@
-from helpers import B_matrix, search_nodes_in_domain
+from helpers import F_array, B_matrix, search_nodes_in_domain
 from components_shape_function.radius import calculate_r
 from params import D
 import numpy as np
 
 
-def create_K_nodal_vector(B, D, nodes_in_domain, weight, jacobian, global_indexes):
-    size = len(nodes_in_domain)
-    K_local_vector_n_indexes = np.empty((0, 3))
+# TODO: Проверить алгоритм работы над индексами, в целом индексацию, их использование при создании матрицы
 
-    for i in range(size):
-        B_i = B[:, i]
-        for j in range(size):
-            B_j = B[:, j]
-            K_local_vector_n_indexes = np.append(
-                K_local_vector_n_indexes,
-                [
-                    [
-                        jacobian * weight * np.dot(np.transpose(B_i), np.dot(D, B_j)),
-                        global_indexes[i],
-                        global_indexes[j]
-                    ]
-                ],
-                axis=0
-            )
-
-    return K_local_vector_n_indexes
+def K_global(integration_points, nodes, nodes_coords):
+    K_global = np.zeros((2 * len(nodes), 2 * len(nodes)))
 
 
-def K_global(cells, n_x, n_y, nodes, coords):
-    K_global = np.zeros((n_x * n_y, n_x * n_y))
+    for point in integration_points:
+        r_array = calculate_r(q_point=point, coords=nodes_coords)
+        global_indexes = search_nodes_in_domain(r_array=r_array)
 
-    for i in range(len(cells)):
-        for j in range(len(cells[i])):
-            for point in cells[i][j].gauss_points:
+        nodes_in_domain = nodes[global_indexes.astype(int)]
 
-                r_array = calculate_r(q_point=point, coords=coords)
-                global_indexes = search_nodes_in_domain(r_array=r_array)
+        F = F_array(q_point=point, nodes_in_domain=nodes_in_domain, r_array=r_array, coords=nodes_coords)
 
-                nodes_in_domain = nodes[global_indexes.astype(int)]
+        # Создание матрицы узловой матрица жёсткости
+        for i in range(len(nodes_in_domain)):
+            for j in range(len(nodes_in_domain)):
+                B_i = B_matrix(F[:, i])
+                B_j = B_matrix(F[:, j])
 
-                B = B_matrix(q_point=point, nodes_in_domain=nodes_in_domain, r_array=r_array, coords=coords)
+                K_local = point.jacobian * point.weight * np.dot(np.transpose(B_i), np.dot(D, B_j))
+                k = int(global_indexes[i])
+                l = int(global_indexes[j])
 
-                # Создание матрицы K
-                K_local_vector_n_indexes = create_K_nodal_vector(
-                    B,
-                    D,
-                    nodes_in_domain,
-                    point.weight,
-                    cells[i][j].jacobian,
-                    global_indexes
-                )
+                K_global[k, k] += K_local[0, 0]
+                K_global[k, l] += K_local[0, 1]
+                K_global[l, l] += K_local[1, 1]
+                K_global[l, k] += K_local[1, 0]
 
-                index_1 = K_local_vector_n_indexes[:, 1]
-                index_2 = K_local_vector_n_indexes[:, 2]
-                K_global[index_1.astype(int), index_2.astype(int)] += K_local_vector_n_indexes[:, 0]
-
-    print("Матрица жесткости сформирована")
+    print("Матрица жесткости сформирована...")
 
     return K_global

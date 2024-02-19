@@ -34,15 +34,3 @@ def dp_dx(point):
 
 def dp_dy(point):
     return np.array([[0], [0], [1], [point.x], [0], [2 * point.y]])
-
-
-def d2p_dx2(point):
-    return np.array([[0], [0], [0], [0], [1], [0]])
-
-
-def d2p_dy2(point):
-    return np.array([[0], [0], [0], [0], [0], [1]])
-
-
-def d2p_dydx(point):
-    return np.array([[0], [0], [0], [1], [0], [0]])
