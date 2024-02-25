@@ -20,7 +20,7 @@ def F_array(q_point, nodes_in_domain, r_array, coords):
 
 def B_matrix(F_i):
     B = np.array([[F_i[0], 0],
-                  [0, F_i[0]],
+                  [0, F_i[1]],
                   [F_i[0], F_i[1]]])
 
     return B

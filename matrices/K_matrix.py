@@ -4,7 +4,9 @@ from params import D
 import numpy as np
 
 
-# TODO: Проверить алгоритм работы над индексами, в целом индексацию, их использование при создании матрицы
+# TODO: Записывать значения для узлов необходимо не на индексы узлов, а на индексы степеней свободы
+# TODO: Закончить с ds, dc (Уменьшить)
+
 
 def K_global(integration_points, nodes, nodes_coords):
     K_global = np.zeros((2 * len(nodes), 2 * len(nodes)))
@@ -25,13 +27,11 @@ def K_global(integration_points, nodes, nodes_coords):
                 B_j = B_matrix(F[:, j])
 
                 K_local = point.jacobian * point.weight * np.dot(np.transpose(B_i), np.dot(D, B_j))
-                k = int(global_indexes[i])
-                l = int(global_indexes[j])
 
-                K_global[k, k] += K_local[0, 0]
-                K_global[k, l] += K_local[0, 1]
-                K_global[l, l] += K_local[1, 1]
-                K_global[l, k] += K_local[1, 0]
+                k = int(global_indexes[i])
+                m = int(global_indexes[j])
+
+                K_global[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += K_local
 
     print("Матрица жесткости сформирована...")
 
