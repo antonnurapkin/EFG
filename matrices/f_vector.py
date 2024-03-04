@@ -1,39 +1,37 @@
 import numpy as np
 from helpers import search_nodes_in_domain
 from components_shape_function.radius import calculate_r, r_derivatives
-from components_shape_function.weight_function import weight_func_array
-from shape_function import F
 from integration_points import create_integration_points_bound
+from shape_function import F
+from components_shape_function.weight_function import weight_func_array
 
 
-def f_global(nodes, nodes_coords, nodes_number, x_bound=False, y_bound=False):
+def f_global(nodes, nodes_coords, t, x_bound=False, y_bound=False, x_value=False, y_value=False):
 
-    f_global = np.zeros((2 * len(nodes), 1))
+    f_global = np.zeros((2 * len(nodes), 1), dtype=np.float64)
 
-    integration_points = create_integration_points_bound(nodes_coords, x_bound=x_bound, y_bound=y_bound)
+    integration_points = create_integration_points_bound(nodes_coords, y_bound=y_bound, x_bound=x_bound, x_value=x_value, y_value=y_value)
 
-    for point in Gauss_points:
-        r_array = calculate_r(q_point=point, coords=coords)
-        global_indexes = search_nodes_in_domain(r_array=r_array)
+    for points_between_nodes in integration_points:
+        for point in points_between_nodes:
+            r_array = calculate_r(q_point=point, coords=nodes_coords)
+            global_indexes = search_nodes_in_domain(r_array=r_array)
 
-        nodes_in_domain = nodes[global_indexes.astype(int)]
+            nodes_in_domain = nodes[global_indexes.astype(int)]
 
-        drdx, drdy, d2rdx2, d2rdy2, d2rdxdy = r_derivatives(r_array, coords, point)
-        w = weight_func_array(r_array, drdx, drdy, d2rdx2, d2rdy2, d2rdxdy)[0]
+            drdx, drdy = r_derivatives(r_array, nodes_coords, point)
+            w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
+            F_array = F(point, nodes_in_domain, w)
 
-        F_array = F(point, nodes_in_domain, w)
+            for i in range(len(nodes_in_domain)):
+                F_i = F_array[i] * np.eye(2)
 
-        f_local_vector_n_indexes = create_f_vector(
-            F_array,
-            b,
-            nodes_in_domain,
-            point.weight,
-            point.jacobian,
-            global_indexes
-        )
+                f_local = point.jacobian * point.weight * np.dot(np.transpose(F_i), t)
 
-        indexes = f_local_vector_n_indexes[:, 1]
-        f_global[indexes.astype(int), 0] += f_local_vector_n_indexes[:, 0]
+                k = int(global_indexes[i])
+
+                f_global[2 * k] += f_local[0]
+                f_global[2 * k + 1] += f_local[1]
 
     print("Вектор сил сформирован")
 

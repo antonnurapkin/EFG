@@ -1,130 +1,120 @@
-from helpers import search_nodes_in_domain, indexes_for_bound_nodes, get_bound_elems, create_s_matrix
+from components_shape_function.radius import calculate_r, r_derivatives
+from components_shape_function.weight_function import weight_func_array
+from helpers import search_nodes_in_domain
+from integration_points import create_integration_points_bound
 from shape_function import F
 import numpy as np
 
+
+# TODO: Количество точек интегрирования сделать константой
 
 def N(g_pos, left_bound, right_bound):
     return (right_bound - g_pos) / (right_bound - left_bound)
 
 
-def create_G_nodal_vector(F, Ni, weight, jacobian, global_indexes, bound_local_index):
-    G_local_vector_n_indexes = np.empty((0, 3))
+def find_nearest_nodes(point, nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
+    if x_bound:
+        value = x_value
+        target_coord = 0
+        other_coord = 1
+        point_coord = point.y
+    elif y_bound:
+        value = y_value
+        target_coord = 1
+        other_coord = 0
+        point_coord = point.x
 
-    for i in range(len(F)):
-        G_local_vector_n_indexes = np.append(
-            G_local_vector_n_indexes,
-            [
-                [
-                    -jacobian * weight * Ni * F[i],
-                    global_indexes[i],
-                    bound_local_index
-                ]
-            ],
-            axis=0
-        )
+    bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[target_coord] == value)[0]], axis=1)
 
-    return G_local_vector_n_indexes
+    idx = (np.abs(bound_nodes_coords[other_coord] - point_coord)).argmin()
+    if bound_nodes_coords[other_coord][idx] > point_coord:
+        return bound_nodes_coords[other_coord][idx], bound_nodes_coords[other_coord][idx - 1]
+    elif bound_nodes_coords[other_coord][idx] < point_coord:
+        return bound_nodes_coords[other_coord][idx + 1], bound_nodes_coords[other_coord][idx]
 
 
-def create_G_matrix(bound_cells, coords, indexes, n_x, n_y):
-    index_node = 0
-    index_cell = 0
+def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_bound=False, x_bound=False):
 
-    current_coord = 1
+    # Нижняя горизонтальная граница, v = 0
+    integration_points_y = create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound)
 
-    counter = 0
+    # Правая вертикальная граница, u = 0
+    integration_points_x = np.flip(create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound))
 
-    i = 1
-    j = 0
+    rows = 2 * len(nodes)
+    cols = nodes_number * 2 * 2
+    G = np.zeros((rows, cols))
 
-    jIncrease = True
-    isCorner = False
-    isLast = False
+    bound_index = 0
 
-    G_global = np.zeros((n_x * n_y, len(indexes)))
+    for points_between_nodes in integration_points_y:
+        print(bound_index)
+        for point in points_between_nodes:
 
-    while counter < len(coords[0]):
+            r_array = calculate_r(q_point=point, coords=nodes_coords)
+            global_indexes = search_nodes_in_domain(r_array=r_array)
 
-        #  Костыли для последнего узла
-        if isLast:
-            # index_node -= 1
-            second = 0
-            index_cell = 0
-            current_coord = 0
-        else:
-            second = index_node + 1
+            nodes_in_domain = nodes[global_indexes.astype(int)]
 
-        first = index_node
+            drdx, drdy = r_derivatives(r_array, nodes_coords, point)
+            w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
+            F_array = F(point, nodes_in_domain, w)
 
-        length_bpoints = len(bound_cells[index_cell].boundary_Gauss_points)
-        for point in bound_cells[index_cell].boundary_Gauss_points[:4]:
-            nodes_in_domain, global_indexes = search_nodes_in_domain(q_point=point, current_cell=bound_cells[index_cell])
+            right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, y_value=y_value, y_bound=y_bound)
 
-            if current_coord == 1:
-                s_coord = point.y
-            else:
-                s_coord = point.x
+            N1 = N(point.x, right, left)
+            N2 = 1 - N1
+            S = np.array([[0, 0], [0, 1]])
 
-            N_interpolant = N(s_coord, coords[current_coord][first], coords[current_coord][second])
+            for i in range(len(nodes_in_domain)):
+                F_i = F_array[i] * np.eye(2)
 
-            F_array = F(point, nodes_in_domain)
+                G1 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N1 * S)
+                G2 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N2 * S)
 
-            G_local_vector_n_indexes = create_G_nodal_vector(
-                F_array,
-                N_interpolant,
-                point.weight,
-                bound_cells[index_cell].jacobian,
-                global_indexes,
-                index_node
-            )
+                k = int(global_indexes[i])
+                m = bound_index
 
-            index_1 = G_local_vector_n_indexes[:, 1]
-            index_2 = G_local_vector_n_indexes[:, 2]
+                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G1
+                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G2
 
-            G_global[index_1.astype(int), index_2.astype(int)] += G_local_vector_n_indexes[:, 0]
 
-        if length_bpoints == 8:
-            bound_cells[index_cell].boundary_Gauss_points = bound_cells[index_cell].boundary_Gauss_points[4:]
+    for points_between_nodes in integration_points_x:
+        print(bound_index)
+        for point in points_between_nodes:
+            r_array = calculate_r(q_point=point, coords=nodes_coords)
+            global_indexes = search_nodes_in_domain(r_array=r_array)
 
-        # Смена индексов и координат
-        index_node += 1
-        counter += 1
-        if isCorner is False:
-            index_cell += 1
+            nodes_in_domain = nodes[global_indexes.astype(int)]
 
-        if index_node == (n_y - 1) * i + (n_x - 1) * j:
-            if jIncrease:
-                j += 1
-                current_coord = 0
-                jIncrease = False
-            else:
-                i += 1
-                current_coord = 1
-                jIncrease = True
-            isCorner = True
+            drdx, drdy = r_derivatives(r_array, nodes_coords, point)
+            w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
+            F_array = F(point, nodes_in_domain, w)
 
-            if isCorner:
-                index_cell -= 1
-                isCorner = False
-        elif index_node == len(coords[0]) - 1:
-            isLast = True
-            index_cell = 0
+            right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, x_value=x_value, x_bound=x_bound)
 
-    return G_global
+            N1 = N(point.y, right, left)
+            N2 = 1 - N1
+            S = np.array([[1, 0], [0, 0]])
 
-def G_global(cells, n_x, n_y):
-    indexes = indexes_for_bound_nodes(n_x, n_y)
-    S = create_s_matrix(cells, indexes)
-    bound_cells = get_bound_elems(cells)
+            for i in range(len(nodes_in_domain)):
+                F_i = F_array[i] * np.eye(2)
 
-    # for cell in bound_cells:
-    #     print("Координаты клетки", cell.x, cell.y)
-    #     print("Координаты точек:", end=" ")
-    #     for point in cell.boundary_Gauss_points:
-    #         print(round(point.x,5), round(point.y,5), end=", ")
-    #     print()
+                G1 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N1 * S)
+                G2 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N2 * S)
 
-    return create_G_matrix(bound_cells, S, indexes, n_x, n_y)
+                k = int(global_indexes[i])
+                m = bound_index
+
+                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G1
+                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G2
+
+        bound_index += 1
+
+
+    print("Матрица G создана...")
+
+    return G
 
 
 
