@@ -64,13 +64,15 @@ def create_nodes(nodes_number, a, b, fi_delta, r0):
 
 
 def get_nodes_coords(nodes):
-    coords = np.empty((2, 0))
+    coords = np.empty((2, 0), dtype='f')
 
     for node in nodes:
         coords = np.append(arr=coords, values=[[node.x], [node.y]], axis=1)
 
     print("Получены координаты узлов...")
+    # print(coords)
+    # print()
 
-    return coords
+    return np.around(coords, decimals=10)
 
 

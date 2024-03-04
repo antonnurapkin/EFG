@@ -86,46 +86,52 @@ def create_integration_points(nodes_coords, nodes_number):
     return integration_points
 
 
-def create_integration_points_bound(nodes_coords, y_bound=False, x_bound=False):
-    integration_points = np.array([])
+def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
+    integration_points = []
 
     point_local_coords = [-1 / np.sqrt(3), 1 / np.sqrt(3)]
     weight = 1
 
     if y_bound:
-        index = 1
-        bound = y_bound
+        current_coord = 1
+        other_coord = 0
+        value = y_value
     elif x_bound:
-        index = 0
-        bound = x_bound
+        current_coord = 0
+        other_coord = 1
+        value = x_value
 
-    bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[index] == bound)[0]], axis=1)
+    bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[current_coord] == value)[0]], axis=1)
 
-    for i in range(len(bound_nodes_coords[index]) - 1):
-        width = (bound_nodes_coords[index][i + 1] - bound_nodes_coords[index][i]) / 2 # Половина ширины
-        centre_coord = bound_nodes_coords[index][i] + width
+    for i in range(len(bound_nodes_coords[other_coord]) - 1):
+        width = (bound_nodes_coords[other_coord][i + 1] - bound_nodes_coords[other_coord][i]) / 2 # Половина ширины
+        centre_coord = bound_nodes_coords[other_coord][i] + width
+
+        temp = np.array([])
 
         for p in point_local_coords:
 
             if y_bound:
                 point_x_coord = centre_coord + width * p
-                point_y_coord = bound
+                point_y_coord = value
             elif x_bound:
-                point_x_coord = bound
+                point_x_coord = value
                 point_y_coord = centre_coord + width * p
 
             jacobian = width
 
-            integration_points = np.append(
-                integration_points,
+            temp = np.append(
+                temp,
                 [
                     Point(x=point_x_coord, y=point_y_coord, weight=weight, jacobian=jacobian)
                 ]
             )
 
+        integration_points.append(temp)
+
     print("Точки интегрирования созданы...")
 
-    return integration_points
+    return np.array(integration_points)
 
 
 

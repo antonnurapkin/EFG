@@ -5,9 +5,9 @@ from components_shape_function.weight_function import weight_func_array
 from components_shape_function.radius import r_derivatives
 
 
-def F_array(q_point, nodes_in_domain, r_array, coords):
-    drdx, drdy = r_derivatives(r_array, coords, q_point)
+def dF_array(q_point, nodes_in_domain, r_array, coords):
 
+    drdx, drdy = r_derivatives(r_array, coords, q_point)
     w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
 
     F = np.vstack([
