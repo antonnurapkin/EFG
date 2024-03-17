@@ -14,6 +14,7 @@ def f_global(nodes, nodes_coords, t, x_bound=False, y_bound=False, x_value=False
 
     for points_between_nodes in integration_points:
         for point in points_between_nodes:
+
             r_array = calculate_r(q_point=point, coords=nodes_coords)
             global_indexes = search_nodes_in_domain(r_array=r_array)
 
@@ -21,6 +22,7 @@ def f_global(nodes, nodes_coords, t, x_bound=False, y_bound=False, x_value=False
 
             drdx, drdy = r_derivatives(r_array, nodes_coords, point)
             w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
+
             F_array = F(point, nodes_in_domain, w)
 
             for i in range(len(nodes_in_domain)):
@@ -33,6 +35,6 @@ def f_global(nodes, nodes_coords, t, x_bound=False, y_bound=False, x_value=False
                 f_global[2 * k] += f_local[0]
                 f_global[2 * k + 1] += f_local[1]
 
-    print("Вектор сил сформирован")
+    print("Вектор сил сформирован...")
 
     return f_global

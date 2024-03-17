@@ -1,36 +1,9 @@
 from components_shape_function.radius import calculate_r, r_derivatives
 from components_shape_function.weight_function import weight_func_array
-from helpers import search_nodes_in_domain
+from helpers import search_nodes_in_domain, N, find_nearest_nodes
 from integration_points import create_integration_points_bound
 from shape_function import F
 import numpy as np
-
-
-# TODO: Количество точек интегрирования сделать константой
-
-def N(g_pos, left_bound, right_bound):
-    return (right_bound - g_pos) / (right_bound - left_bound)
-
-
-def find_nearest_nodes(point, nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
-    if x_bound:
-        value = x_value
-        target_coord = 0
-        other_coord = 1
-        point_coord = point.y
-    elif y_bound:
-        value = y_value
-        target_coord = 1
-        other_coord = 0
-        point_coord = point.x
-
-    bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[target_coord] == value)[0]], axis=1)
-
-    idx = (np.abs(bound_nodes_coords[other_coord] - point_coord)).argmin()
-    if bound_nodes_coords[other_coord][idx] > point_coord:
-        return bound_nodes_coords[other_coord][idx], bound_nodes_coords[other_coord][idx - 1]
-    elif bound_nodes_coords[other_coord][idx] < point_coord:
-        return bound_nodes_coords[other_coord][idx + 1], bound_nodes_coords[other_coord][idx]
 
 
 def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_bound=False, x_bound=False):
@@ -47,8 +20,8 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
     bound_index = 0
 
+    # Нижняя горизонтальная граница, v = 0
     for points_between_nodes in integration_points_y:
-        print(bound_index)
         for point in points_between_nodes:
 
             r_array = calculate_r(q_point=point, coords=nodes_coords)
@@ -64,7 +37,7 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
             N1 = N(point.x, right, left)
             N2 = 1 - N1
-            S = np.array([[0, 0], [0, 1]])
+            S = np.array([[1, 0], [0, 1]])
 
             for i in range(len(nodes_in_domain)):
                 F_i = F_array[i] * np.eye(2)
@@ -74,13 +47,17 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
                 k = int(global_indexes[i])
                 m = bound_index
+                l = m + 1
 
                 G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G1
-                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G2
+                G[2 * k: 2 * k + 2, 2 * l: 2 * l + 2] += G2
 
+        bound_index += 1
 
+    bound_index += 1
+
+    # Левая вертикальная граница, u = 0
     for points_between_nodes in integration_points_x:
-        print(bound_index)
         for point in points_between_nodes:
             r_array = calculate_r(q_point=point, coords=nodes_coords)
             global_indexes = search_nodes_in_domain(r_array=r_array)
@@ -95,7 +72,7 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
             N1 = N(point.y, right, left)
             N2 = 1 - N1
-            S = np.array([[1, 0], [0, 0]])
+            S = np.array([[1, 0], [0, 1]])
 
             for i in range(len(nodes_in_domain)):
                 F_i = F_array[i] * np.eye(2)
@@ -105,12 +82,15 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
                 k = int(global_indexes[i])
                 m = bound_index
+                l = m + 1
 
                 G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G1
-                G[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += G2
+                G[2 * k: 2 * k + 2, 2 * l: 2 * l + 2] += G2
 
         bound_index += 1
 
+    idx_zero_cols = np.argwhere(np.all(G[..., :] == 0, axis=0))
+    G_non_degenerate = np.delete(G, idx_zero_cols, axis=1)
 
     print("Матрица G создана...")
 
