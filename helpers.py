@@ -25,6 +25,7 @@ def B_matrix(F_i):
 
     return B
 
+
 def search_nodes_in_domain(r_array):
 
     global_indexes = np.array([])
@@ -36,51 +37,33 @@ def search_nodes_in_domain(r_array):
     return global_indexes
 
 
-def delete_duplicates(arr):
-    to_delete = [i for i in range(len(arr) - 1) if arr[i] == arr[i + 1]]
-
-    return np.delete(arr, to_delete)[:-1]
-
-
-def indexes_for_bound_nodes(n_x, n_y):
-    left = np.array([i for i in range(n_y)])
-    bottom = np.array([n_y * (i + 1) - 1 for i in range(n_x)])
-    right = np.flip(np.array([(n_x - 1) * n_y + i for i in range(n_y)]))
-    top = np.flip(np.array([n_y * i for i in range(n_x)]))
-
-    global_bound_indexes = delete_duplicates(np.concatenate([left, bottom, right, top]))
-    local_bound_indexes = np.arange(0, len(global_bound_indexes), 1)
-
-    result = np.transpose(np.vstack((global_bound_indexes, local_bound_indexes)))
-
-    return result
-
-
-def get_bound_elems(cells):
-    left_bound = cells[:, 0]
-    bottom_bound = cells[-1, :][1:]
-    right_bound = np.flip(cells[:, -1][:-1])
-    top_bound = np.flip(cells[0, :][1:-1])
-
-    return np.concatenate((left_bound, bottom_bound, right_bound, top_bound))
-
-
-def create_s_matrix(cells, indexes):
-    s = np.zeros((2, len(indexes)))
-
-    for i in range(len(cells)):
-        for j in range(len(cells[i])):
-            for node in cells[i][j].nodes:
-                if node.global_index in indexes[:, 0]:
-                    insert_index = np.where(indexes[:, 0] == node.global_index)[0][0]
-                    s[0][insert_index] = node.get_x_coord
-                    s[1][insert_index] = node.get_y_coord
-
-    return s
-
-
 def get_x_coord(r, fi):
     return r * np.cos(fi)
 
 def get_y_coord(r, fi):
     return r * np.sin(fi)
+
+
+def N(g_pos, left_bound, right_bound):
+    return (right_bound - g_pos) / (right_bound - left_bound)
+
+
+def find_nearest_nodes(point, nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
+    if x_bound:
+        value = x_value
+        target_coord = 0
+        other_coord = 1
+        point_coord = point.y
+    elif y_bound:
+        value = y_value
+        target_coord = 1
+        other_coord = 0
+        point_coord = point.x
+
+    bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[target_coord] == value)[0]], axis=1)
+
+    idx = (np.abs(bound_nodes_coords[other_coord] - point_coord)).argmin()
+    if bound_nodes_coords[other_coord][idx] > point_coord:
+        return bound_nodes_coords[other_coord][idx], bound_nodes_coords[other_coord][idx - 1]
+    elif bound_nodes_coords[other_coord][idx] < point_coord:
+        return bound_nodes_coords[other_coord][idx + 1], bound_nodes_coords[other_coord][idx]

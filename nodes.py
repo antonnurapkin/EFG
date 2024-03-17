@@ -8,11 +8,28 @@ class Node:
         self.y = y
         self.global_index = global_index
 
+        self.u_solution = None
+        self.v_solution = None
+
+        self.u_real = None
+        self.u_real = None
+
+
 
 def create_nodes(nodes_number, a, b, fi_delta, r0):
 
     nodes = np.array([])
-    global_index = 1
+    global_index = 0
+
+    # Для просто прямоугольника
+    # step_x = a / (nodes_number - 1)
+    # step_y = b / (nodes_number - 1)
+    #
+    # for i in range(nodes_number):
+    #     for j in range(nodes_number):
+    #         nodes = np.append(nodes, [Node(step_x * i, step_y * j, global_index)])
+    #         global_index += 1
+
 
     # Вертикальная граница
     for i in range(nodes_number):
@@ -70,8 +87,6 @@ def get_nodes_coords(nodes):
         coords = np.append(arr=coords, values=[[node.x], [node.y]], axis=1)
 
     print("Получены координаты узлов...")
-    # print(coords)
-    # print()
 
     return np.around(coords, decimals=10)
 

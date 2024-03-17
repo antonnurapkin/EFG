@@ -89,8 +89,11 @@ def create_integration_points(nodes_coords, nodes_number):
 def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
     integration_points = []
 
-    point_local_coords = [-1 / np.sqrt(3), 1 / np.sqrt(3)]
-    weight = 1
+    # local_coords = [-1 / np.sqrt(3), 1 / np.sqrt(3)]
+    # weights = [1, 1]
+
+    local_coords = [-0.861136, -0.339981, 0.339981, 0.861136]
+    weights = [0.347854, 0.652145, 0.652145, 0.347854]
 
     if y_bound:
         current_coord = 1
@@ -109,21 +112,21 @@ def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, 
 
         temp = np.array([])
 
-        for p in point_local_coords:
+        for j in range(len(local_coords)):
 
             if y_bound:
-                point_x_coord = centre_coord + width * p
+                point_x_coord = centre_coord + width * local_coords[j]
                 point_y_coord = value
             elif x_bound:
                 point_x_coord = value
-                point_y_coord = centre_coord + width * p
+                point_y_coord = centre_coord + width * local_coords[j]
 
             jacobian = width
 
             temp = np.append(
                 temp,
                 [
-                    Point(x=point_x_coord, y=point_y_coord, weight=weight, jacobian=jacobian)
+                    Point(x=point_x_coord, y=point_y_coord, weight=weights[j], jacobian=jacobian)
                 ]
             )
 
