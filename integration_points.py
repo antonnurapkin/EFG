@@ -2,6 +2,7 @@ import numpy as np
 
 
 # Точка Гаусса
+# Для удобства, в объекте находится и вес точки и якобиан ячейки, в которой она находится
 class Point:
     def __init__(self, x, y, weight, jacobian=None):
         self.x = x
@@ -45,6 +46,7 @@ def calculate_jacobain(x_coords, y_coords, ksi, nu):
     return np.linalg.det(np.array([[J11, J12], [J21, J22]]))
 
 
+# Функция для вычисления координат точек Гаусса внутри "ячеек"
 def create_integration_points(nodes_coords, nodes_number):
 
     integration_points = np.array([])
@@ -86,6 +88,7 @@ def create_integration_points(nodes_coords, nodes_number):
     return integration_points
 
 
+# Функция для вычисления координат точек Гаусса на границах
 def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
     integration_points = []
 
@@ -95,6 +98,7 @@ def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, 
     local_coords = [-0.861136, -0.339981, 0.339981, 0.861136]
     weights = [0.347854, 0.652145, 0.652145, 0.347854]
 
+    # Сделано для удобства, чтобы эту функцию можно использовать для любой границы
     if y_bound:
         current_coord = 1
         other_coord = 0
@@ -104,9 +108,11 @@ def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, 
         other_coord = 1
         value = x_value
 
+    # Вычисления координат узлов на текущей границе
     bound_nodes_coords = np.sort(nodes_coords[:, np.where(nodes_coords[current_coord] == value)[0]], axis=1)
 
     for i in range(len(bound_nodes_coords[other_coord]) - 1):
+        # Вычисления ширины участка интегрирования и центра
         width = (bound_nodes_coords[other_coord][i + 1] - bound_nodes_coords[other_coord][i]) / 2 # Половина ширины
         centre_coord = bound_nodes_coords[other_coord][i] + width
 
@@ -114,6 +120,7 @@ def create_integration_points_bound(nodes_coords, y_value=False, x_value=False, 
 
         for j in range(len(local_coords)):
 
+            # Сделано для удобства, чтобы эту функцию можно использовать для любой границы
             if y_bound:
                 point_x_coord = centre_coord + width * local_coords[j]
                 point_y_coord = value

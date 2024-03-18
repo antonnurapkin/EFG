@@ -10,12 +10,12 @@ def dF_array(q_point, nodes_in_domain, r_array, coords):
     drdx, drdy = r_derivatives(r_array, coords, q_point)
     w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
 
-    F = np.vstack([
+    dF = np.vstack([
         dFdx(q_point, nodes_in_domain, w, dwdy),
         dFdy(q_point, nodes_in_domain, w, dwdx)
     ])
 
-    return F
+    return dF
 
 
 def B_matrix(F_i):

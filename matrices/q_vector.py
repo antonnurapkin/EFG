@@ -1,10 +1,7 @@
 import numpy as np
 
-from components_shape_function.radius import calculate_r, r_derivatives
-from components_shape_function.weight_function import weight_func_array
 from helpers import search_nodes_in_domain, find_nearest_nodes, N
 from integration_points import create_integration_points_bound
-from shape_function import F
 from exact_solution import u_radial
 
 
@@ -28,6 +25,7 @@ def q_global(nodes, nodes_coords, rows, y_value=False, x_value=False, y_bound=Fa
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])
 
+            # Вычисления точного решениия(см. учебник Демидова) в конкретной точке Гаусса
             u_exact = np.array([[0], [u_radial(r=point.x, tetta=0)]])
 
             q1 = -point.jacobian * point.weight * np.dot(N1 * S, u_exact)

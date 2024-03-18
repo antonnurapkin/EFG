@@ -34,22 +34,7 @@ def d_weight_func(r, dr):
             return 0
 
 
-def d2_weight_func(r, d2r):
-    if WEIGHT_FUNCTION_TYPE == "quadratic":
-        if 0 <= r <= 1:
-            return (-12 + 48 * r - 36 * r ** 2) * d2r
-        else:
-            return 0
-    elif WEIGHT_FUNCTION_TYPE == "cubic":
-        if 0 <= r <= 0.5:
-            return (-8 + 24 * r) * d2r
-        elif 0.5 < r <= 1:
-            return (8 - 8 * r) * d2r
-        elif r > 1:
-            return 0
-
-
-def weight_func_array(r, drdx, drdy):
+def weight_func_array(r, drdx, drdy, weight_function=False):
     w = np.zeros(r.shape)
     dwdx = np.zeros(drdx.shape)
     dwdy = np.zeros(drdy.shape)
@@ -63,4 +48,7 @@ def weight_func_array(r, drdx, drdy):
     dwdx = dwdx[dwdx != 0]
     dwdy = dwdy[dwdy != 0]
 
-    return w, dwdx, dwdy
+    if weight_function:
+        return w
+    else:
+        return w, dwdx, dwdy

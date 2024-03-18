@@ -8,6 +8,7 @@ import numpy as np
 
 def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_bound=False, x_bound=False):
 
+    # Вычисления координат точек Гаусса на границах
     # Нижняя горизонтальная граница, v = 0
     integration_points_y = create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound)
 
@@ -18,11 +19,11 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
     cols = nodes_number * 2 * 2
     G = np.zeros((rows, cols))
 
-    bound_index = 0
+    bound_index = 0  # Индексирования узлов на границе
 
     # Нижняя горизонтальная граница, v = 0
-    for points_between_nodes in integration_points_y:
-        for point in points_between_nodes:
+    for points_between_nodes in integration_points_y:  # Общий цикл
+        for point in points_between_nodes:  # Цикл для точек внутри "ячейки"
 
             r_array = calculate_r(q_point=point, coords=nodes_coords)
             global_indexes = search_nodes_in_domain(r_array=r_array)
@@ -33,11 +34,12 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
             w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
             F_array = F(point, nodes_in_domain, w)
 
+            # Поиск соседних узлов
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, y_value=y_value, y_bound=y_bound)
 
             N1 = N(point.x, right, left)
             N2 = 1 - N1
-            S = np.array([[1, 0], [0, 1]])
+            S = np.array([[1, 0], [0, 1]])  # Для удобства
 
             for i in range(len(nodes_in_domain)):
                 F_i = F_array[i] * np.eye(2)
@@ -89,8 +91,8 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
         bound_index += 1
 
-    idx_zero_cols = np.argwhere(np.all(G[..., :] == 0, axis=0))
-    G_non_degenerate = np.delete(G, idx_zero_cols, axis=1)
+    # idx_zero_cols = np.argwhere(np.all(G[..., :] == 0, axis=0))
+    # G_non_degenerate = np.delete(G, idx_zero_cols, axis=1)
 
     print("Матрица G создана...")
 
