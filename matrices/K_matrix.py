@@ -1,8 +1,7 @@
 from helpers import dF_array, B_matrix, search_nodes_in_domain
-from components_shape_function.radius import calculate_r
+from shape_function.components_shape_function.radius import calculate_r
 from params import D
 import numpy as np
-from plotly import graph_objects as go
 
 
 def K_global(integration_points, nodes, nodes_coords):

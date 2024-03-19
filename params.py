@@ -17,18 +17,19 @@ D = D_init_const * np.array(D_init_array)
 
 '''ПАРАМЕТРЫ ГЕОМЕТРИИ'''
 A = 1  # Размер пластины в направлении оси Х
-B = 1  # Размер пластины в направлении оси Х
-R0 = A / 20  # Радиус отверстия
+B = 1  # Размер пластины в направлении оси Y
+R0 = A / 10  # Радиус отверстия
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
-NODES_NUMBER = 4
-CELLS = NODES_NUMBER - 1  # Сетка для интегрирования
-FI_DELTA = np.pi / (2 * (CELLS * 2))  # Шаг угла для разбиения
+NODES_NUMBER_TETTA = 6
+NODES_NUMBER_RADIAL = 12
+
+FI_DELTA = np.pi / (2 * ((NODES_NUMBER_TETTA - 1) * 2))  # Шаг угла для разбиения
 
 # Размер области поддержки
 # x
-ALPHA_X = 3.5
+ALPHA_X = 2.5
 DC_X = ((1 / 4 * ALPHA_X) ** 2) / (np.sqrt(12) - 1)  # характеристическая длина ( расстояние между двумя узлами )
 
 DS = ALPHA_X * DC_X
@@ -37,6 +38,6 @@ DS = ALPHA_X * DC_X
 WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
 '''НАГРУЗКА'''
-t = np.array([[0], [100000]])  # [[tx], [ty]]
+t = np.array([[0], [1000]])  # [[tx], [ty]]
 
 

@@ -1,8 +1,8 @@
-from components_shape_function.radius import calculate_r, r_derivatives
-from components_shape_function.weight_function import weight_func_array
+from shape_function.components_shape_function.radius import calculate_r, r_derivatives
+from shape_function.components_shape_function.weight_function import weight_func_array
 from helpers import search_nodes_in_domain, N, find_nearest_nodes
 from integration_points import create_integration_points_bound
-from shape_function import F
+from shape_function.shape_function import F
 import numpy as np
 
 
@@ -10,10 +10,10 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
     # Вычисления координат точек Гаусса на границах
     # Нижняя горизонтальная граница, v = 0
-    integration_points_y = create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound)
+    integration_points_y = np.flip(create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound))
 
     # Правая вертикальная граница, u = 0
-    integration_points_x = np.flip(create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound))
+    integration_points_x = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
 
     rows = 2 * len(nodes)
     cols = nodes_number * 2 * 2
@@ -90,9 +90,6 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
                 G[2 * k: 2 * k + 2, 2 * l: 2 * l + 2] += G2
 
         bound_index += 1
-
-    # idx_zero_cols = np.argwhere(np.all(G[..., :] == 0, axis=0))
-    # G_non_degenerate = np.delete(G, idx_zero_cols, axis=1)
 
     print("Матрица G создана...")
 

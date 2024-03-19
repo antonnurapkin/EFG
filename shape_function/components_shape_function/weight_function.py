@@ -45,6 +45,7 @@ def weight_func_array(r, drdx, drdy, weight_function=False):
         dwdy[i] = d_weight_func(r[i], drdy[i])
 
     w = w[w != 0]
+
     dwdx = dwdx[dwdx != 0]
     dwdy = dwdy[dwdy != 0]
 

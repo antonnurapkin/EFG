@@ -1,4 +1,4 @@
-from components_shape_function.p import p
+from shape_function.shape_function import p
 import numpy as np
 
 

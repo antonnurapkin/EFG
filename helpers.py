@@ -1,8 +1,8 @@
 import numpy as np
 
-from shape_function import dFdx, dFdy, F
-from components_shape_function.weight_function import weight_func_array
-from components_shape_function.radius import r_derivatives
+from shape_function.shape_function import dFdx, dFdy
+from shape_function.components_shape_function.weight_function import weight_func_array
+from shape_function.components_shape_function.radius import r_derivatives
 
 
 def dF_array(q_point, nodes_in_domain, r_array, coords):

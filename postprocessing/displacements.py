@@ -1,8 +1,7 @@
 from helpers import search_nodes_in_domain
-from components_shape_function.radius import calculate_r, r_derivatives
-from components_shape_function.weight_function import weight_func_array
-from shape_function import F
-import numpy as np
+from shape_function.components_shape_function.radius import calculate_r, r_derivatives
+from shape_function.components_shape_function.weight_function import weight_func_array
+from shape_function.shape_function import F
 
 
 def write_solution(nodes, u):

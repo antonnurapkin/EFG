@@ -51,10 +51,10 @@ def calculate_coeff(a, b, u, v):
     return related_coeff * average_size / average_max_displ
 
 
-def create_scatterplot(x1, y1, x2, y2):
+def create_scatterplot(x1, y1, x2, y2, indexes):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x1, y=y1, mode="markers", name="Недеформированное состояние", fillcolor='rgba(100,100,255,0.5)'))
-    fig.add_trace(go.Scatter(x=x2, y=y2, mode="markers", name="Деформированное состояние"))
+    fig.add_trace(go.Scatter(x=x1, y=y1, text=indexes, mode="markers", name="Недеформированное состояние", fillcolor='rgba(100,100,255,0.5)'))
+    fig.add_trace(go.Scatter(x=x2, y=y2, text=indexes, mode="markers", name="Деформированное состояние"))
 
     fig.update_layout(title_text=f'Деформированное и недеформированное состояние',
                       title_x=0.5,
@@ -74,7 +74,9 @@ def show_deformed_shape(nodes, a, b):
     x2 = np.array([node.x + node.u_real * coeff for node in nodes])
     y2 = np.array([node.y + node.v_real * coeff for node in nodes])
 
-    create_scatterplot(x1=x1, y1=y1, x2=x2, y2=y2)
+    global_indexes = np.array([node.global_index for node in nodes])
+
+    create_scatterplot(x1=x1, y1=y1, x2=x2, y2=y2, indexes=global_indexes)
 
 
 

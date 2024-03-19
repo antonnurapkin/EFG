@@ -1,9 +1,9 @@
 import numpy as np
 from helpers import search_nodes_in_domain
-from components_shape_function.radius import calculate_r, r_derivatives
+from shape_function.components_shape_function.radius import calculate_r, r_derivatives
 from integration_points import create_integration_points_bound
-from shape_function import F
-from components_shape_function.weight_function import weight_func_array
+from shape_function.shape_function import F
+from shape_function.components_shape_function.weight_function import weight_func_array
 
 
 def f_global(nodes, nodes_coords, t, x_bound=False, y_bound=False, x_value=False, y_value=False):

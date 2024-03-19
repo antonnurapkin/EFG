@@ -13,17 +13,6 @@ import numpy as np
 #     return np.array([[0], [0], [1]])
 
 
-def d2p_dx2(point):
-    return np.array([[0], [0], [0]])
-
-
-def d2p_dy2(point):
-    return np.array([[0], [0], [0]])
-
-
-def d2p_dydx(point):
-    return np.array([[0], [0], [0]])
-
 def p(point):
     return np.array([[1], [point.x], [point.y], [point.y * point.x], [point.x ** 2], [point.y ** 2]])
 

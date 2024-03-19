@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import get_x_coord,get_y_coord
+from helpers import get_x_coord, get_y_coord
 
 
 class Node:
@@ -15,8 +15,7 @@ class Node:
         self.u_real = None
 
 
-
-def create_nodes(nodes_number, a, b, fi_delta, r0):
+def create_nodes(nodes_number_radial, nodes_number_tetta, a, b, fi_delta, r0):
 
     nodes = np.array([])
     global_index = 0
@@ -32,18 +31,18 @@ def create_nodes(nodes_number, a, b, fi_delta, r0):
 
 
     # Вертикальная граница
-    for i in range(nodes_number):
-        x_left_bound = a
-        y_left_bound = i * (b / (nodes_number - 1))
+    for i in range(nodes_number_tetta):
+        x_right_bound = a
+        y_right_bound = i * (b / (nodes_number_tetta - 1))
         fi_current = fi_delta * i
 
-        distance = np.sqrt((x_left_bound - get_x_coord(r0, fi_current)) ** 2 + (y_left_bound - get_y_coord(r0, fi_current)) ** 2)
-        r_delta = distance / (nodes_number - 1)
+        distance = np.sqrt((x_right_bound - get_x_coord(r0, fi_current)) ** 2 + (y_right_bound - get_y_coord(r0, fi_current)) ** 2)
+        r_delta = distance / (nodes_number_radial - 1)
 
-        for j in range(nodes_number):
+        for j in range(nodes_number_radial):
 
-            if j == nodes_number - 1:
-                x_coord = x_left_bound
+            if j == nodes_number_radial - 1:
+                x_coord = x_right_bound
             else:
                 x_coord = get_x_coord(r_delta * j + r0, fi_current)
 
@@ -55,17 +54,17 @@ def create_nodes(nodes_number, a, b, fi_delta, r0):
     fi_middle = fi_current
 
     # Горизонтальная граница
-    for i in range(nodes_number - 1):
-        x_top_bound = a - (i + 1) * (a / (nodes_number - 1))
+    for i in range(nodes_number_tetta - 1):
+        x_top_bound = a - (i + 1) * (a / (nodes_number_tetta - 1))
         y_top_bound = b
         fi_current = fi_delta * (i + 1) + fi_middle
 
         distance = np.sqrt((x_top_bound - get_x_coord(r0, fi_current)) ** 2 + (y_top_bound - get_y_coord(r0, fi_current)) ** 2)
-        r_delta = distance / (nodes_number - 1)
+        r_delta = distance / (nodes_number_radial - 1)
 
-        for j in range(nodes_number):
+        for j in range(nodes_number_radial):
 
-            if j == nodes_number - 1:
+            if j == nodes_number_radial - 1:
                 y_coord = y_top_bound
             else:
                 y_coord = get_y_coord(r_delta * j + r0, fi_current)
