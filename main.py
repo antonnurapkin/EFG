@@ -7,7 +7,7 @@ from matrices.f_vector import f_global
 from matrices.G_matrix import G_global
 from matrices.q_vector import q_global
 from postprocessing.displacements import get_real_displacements
-from params import A, NODES_NUMBER_TETTA, NODES_NUMBER_RADIAL, t, B, R0, FI_DELTA
+from params import A, NODES_NUMBER_TETTA, NODES_NUMBER_RADIAL, B, R0, FI_DELTA
 from postprocessing.vizualization import show_displacement, show_deformed_shape
 
 
@@ -32,7 +32,7 @@ def main():
     K = K_global(integration_points=integration_points, nodes=nodes, nodes_coords=nodes_coords)
 
     # Вектор сил(алгоритм аналогичен матрице K)
-    f = f_global(nodes=nodes, nodes_coords=nodes_coords, t=t, y_bound=True, y_value=1)
+    f = f_global(nodes=nodes, nodes_coords=nodes_coords, y_bound=True, y_value=1)
 
     # Матрица для соблюдения ГУ
     G = G_global(

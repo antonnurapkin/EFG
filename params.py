@@ -23,7 +23,7 @@ R0 = A / 10  # Радиус отверстия
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
 NODES_NUMBER_TETTA = 6
-NODES_NUMBER_RADIAL = 12
+NODES_NUMBER_RADIAL = 8
 
 FI_DELTA = np.pi / (2 * ((NODES_NUMBER_TETTA - 1) * 2))  # Шаг угла для разбиения
 
@@ -38,6 +38,6 @@ DS = ALPHA_X * DC_X
 WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
 '''НАГРУЗКА'''
-t = np.array([[0], [1000]])  # [[tx], [ty]]
-
+# t = np.array([[0], [1000]])  # [[tx], [ty]]
+P = 1000000
 

@@ -11,8 +11,8 @@ def dF_array(q_point, nodes_in_domain, r_array, coords):
     w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
 
     dF = np.vstack([
-        dFdx(q_point, nodes_in_domain, w, dwdy),
-        dFdy(q_point, nodes_in_domain, w, dwdx)
+        dFdx(q_point, nodes_in_domain, w, dwdx),
+        dFdy(q_point, nodes_in_domain, w, dwdy)
     ])
 
     return dF
@@ -42,6 +42,12 @@ def get_x_coord(r, fi):
 
 def get_y_coord(r, fi):
     return r * np.sin(fi)
+
+def get_tetta(x, y):
+    return np.arctan(y / x)
+
+def get_rad(tetta, x):
+    return x / np.cos(tetta)
 
 
 def N(g_pos, left_bound, right_bound):

@@ -27,7 +27,7 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
             S = np.array([[1, 0], [0, 1]])
 
             # Вычисления точного решениия(см. учебник Демидова) в конкретной точке Гаусса
-            u_exact = np.array([[u_radial(r=point.x, tetta=0)], [0]])
+            u_exact = np.array([[u_radial(r=point.x, tetta=np.pi / 2)], [0]])
 
             q1 = -point.jacobian * point.weight * np.dot(N1 * S, u_exact)
             q2 = -point.jacobian * point.weight * np.dot(N2 * S, u_exact)
@@ -54,7 +54,7 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])
 
-            u_exact = np.array([[0], [u_radial(r=point.y, tetta=np.pi / 2)]])
+            u_exact = np.array([[0], [u_radial(r=point.y, tetta=0)]])
 
             q1 = -point.jacobian * point.weight * np.dot(N1 * S, u_exact)
             q2 = -point.jacobian * point.weight * np.dot(N2 * S, u_exact)

@@ -5,7 +5,6 @@ import numpy as np
 
 
 def K_global(integration_points, nodes, nodes_coords):
-
     K = np.zeros((2 * len(nodes), 2 * len(nodes)), dtype=np.float64)
     for point in integration_points:
         # Вычисляется некое характеристическое расстояние от точки интегрирования до всех узлов
