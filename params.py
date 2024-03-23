@@ -22,14 +22,17 @@ R0 = A / 10  # Радиус отверстия
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
+MULTIPLY_COEFF = 2.5
 NODES_NUMBER_TETTA = 6
-NODES_NUMBER_RADIAL = 8
+NODES_NUMBER_RADIAL_NEAR_HOLE = 4
+NODES_NUMBER_RADIAL_NEAR_BOUNDS = 6
+NODES_NUMBER_RADIAL = NODES_NUMBER_RADIAL_NEAR_HOLE + NODES_NUMBER_RADIAL_NEAR_BOUNDS
 
 FI_DELTA = np.pi / (2 * ((NODES_NUMBER_TETTA - 1) * 2))  # Шаг угла для разбиения
 
 # Размер области поддержки
 # x
-ALPHA_X = 2.5
+ALPHA_X = 3
 DC_X = ((1 / 4 * ALPHA_X) ** 2) / (np.sqrt(12) - 1)  # характеристическая длина ( расстояние между двумя узлами )
 
 DS = ALPHA_X * DC_X
@@ -39,5 +42,5 @@ WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
 '''НАГРУЗКА'''
 # t = np.array([[0], [1000]])  # [[tx], [ty]]
-P = 1000000
+P = 10000
 

@@ -4,8 +4,9 @@ from params import D
 import numpy as np
 
 
-def K_global(integration_points, nodes, nodes_coords):
+def K_global(nodes, integration_points, nodes_coords):
     K = np.zeros((2 * len(nodes), 2 * len(nodes)), dtype=np.float64)
+
     for point in integration_points:
         # Вычисляется некое характеристическое расстояние от точки интегрирования до всех узлов
         r_array = calculate_r(q_point=point, coords=nodes_coords)
@@ -32,6 +33,6 @@ def K_global(integration_points, nodes, nodes_coords):
 
                 K[2 * k: 2 * k + 2, 2 * m: 2 * m + 2] += K_local
 
-    print("Матрица жесткости сформирована...")
+    print(f"Матрица жесткости {K.shape} сформирована...")
 
     return K

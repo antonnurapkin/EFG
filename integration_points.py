@@ -1,4 +1,5 @@
 import numpy as np
+from params import NODES_NUMBER_RADIAL
 
 
 # Точка Гаусса
@@ -47,7 +48,7 @@ def calculate_jacobain(x_coords, y_coords, ksi, nu):
 
 
 # Функция для вычисления координат точек Гаусса внутри "ячеек"
-def create_integration_points(nodes_coords, nodes_number):
+def create_integration_points(nodes_coords):
 
     integration_points = np.array([])
 
@@ -60,12 +61,12 @@ def create_integration_points(nodes_coords, nodes_number):
 
     weight = 1
 
-    for i in range(len(nodes_coords[0]) // nodes_number - 1):
-        for j in range(nodes_number - 1):
-            x1, y1 = nodes_coords[:, i * nodes_number + j]
-            x2, y2 = nodes_coords[:, i * nodes_number + j + 1]
-            x3, y3 = nodes_coords[:, (i + 1) * nodes_number + j + 1]
-            x4, y4 = nodes_coords[:, (i + 1) * nodes_number + j]
+    for i in range(len(nodes_coords[0]) // NODES_NUMBER_RADIAL - 1):
+        for j in range(NODES_NUMBER_RADIAL - 1):
+            x1, y1 = nodes_coords[:, i * NODES_NUMBER_RADIAL + j]
+            x2, y2 = nodes_coords[:, i * NODES_NUMBER_RADIAL + j + 1]
+            x3, y3 = nodes_coords[:, (i + 1) * NODES_NUMBER_RADIAL + j + 1]
+            x4, y4 = nodes_coords[:, (i + 1) * NODES_NUMBER_RADIAL + j]
 
             nodes_x_coords = np.array([x1, x2, x3, x4])
             nodes_y_coords = np.array([y1, y2, y3, y4])

@@ -7,20 +7,14 @@ from matrices.f_vector import f_global
 from matrices.G_matrix import G_global
 from matrices.q_vector import q_global
 from postprocessing.displacements import get_real_displacements
-from params import A, NODES_NUMBER_TETTA, NODES_NUMBER_RADIAL, B, R0, FI_DELTA
-from postprocessing.vizualization import show_displacement, show_deformed_shape, show_nodes
+from params import A, B
+from postprocessing.stress import calculate_stress
+from postprocessing.vizualization import show_displacement, show_deformed_shape, show_nodes, show_stress
 
 
 def main():
     # Создание узлов
-    nodes = create_nodes(
-        nodes_number_tetta=NODES_NUMBER_TETTA,
-        nodes_number_radial=NODES_NUMBER_RADIAL,
-        a=A,
-        b=B,
-        fi_delta=FI_DELTA,
-        r0=R0
-    )
+    nodes = create_nodes()
 
     # Создание матрицы с координатами для удобства
     nodes_coords = get_nodes_coords(nodes=nodes)
@@ -28,10 +22,10 @@ def main():
     show_nodes(nodes_coords=nodes_coords)
 
     # Точки Гаусса
-    integration_points = create_integration_points(nodes_coords=nodes_coords, nodes_number=NODES_NUMBER_RADIAL)
+    integration_points = create_integration_points(nodes_coords=nodes_coords)
 
     # Матрица жесткости
-    K = K_global(integration_points=integration_points, nodes=nodes, nodes_coords=nodes_coords)
+    K = K_global(nodes=nodes, integration_points=integration_points, nodes_coords=nodes_coords)
 
     # Вектор сил(алгоритм аналогичен матрице K)
     f = f_global(nodes=nodes, nodes_coords=nodes_coords, y_bound=True, y_value=1)
@@ -40,7 +34,6 @@ def main():
     G = G_global(
         nodes=nodes,
         nodes_coords=nodes_coords,
-        nodes_number=NODES_NUMBER_RADIAL,
         x_bound=True,
         x_value=0.0,
         y_bound=True,
@@ -65,9 +58,12 @@ def main():
     # Так как функции формы не соответсвуют символу Кронекера, то полученное решение не является действительным перемещением
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
+    stress = calculate_stress(u=u, nodes=nodes, nodes_coords=nodes_coords, integration_points=integration_points)
 
-    show_displacement(nodes=nodes, r0=R0)
-    show_deformed_shape(nodes=nodes, a=A, b=B)
+    show_displacement(nodes=nodes, nodes_coords=nodes_coords)
+    show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+    show_stress(stress=stress, integration_points=integration_points)
+
 
 if __name__ == "__main__":
     main()

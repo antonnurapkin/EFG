@@ -31,7 +31,9 @@ def f_global(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y
             for i in range(len(nodes_in_domain)):
                 F_i = F_array[i] * np.eye(2)
 
-                t = np.array([[0], [P]])
+                tetta = get_tetta(x=point.x, y=point.y)
+                rad = get_rad(tetta=tetta, x=point.x)
+                t = np.array([[0], [stress_yy(r=rad, tetta=tetta)]])
                 f_local = point.jacobian * point.weight * np.dot(np.transpose(F_i), t)
 
                 k = int(global_indexes[i])
@@ -39,6 +41,6 @@ def f_global(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y
                 f_global[2 * k] += f_local[0]
                 f_global[2 * k + 1] += f_local[1]
 
-    print("Вектор сил сформирован...")
+    print(f"Вектор сил {f_global.shape} сформирован...")
 
     return f_global

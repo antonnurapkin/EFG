@@ -1,12 +1,13 @@
 from shape_function.components_shape_function.radius import calculate_r, r_derivatives
 from shape_function.components_shape_function.weight_function import weight_func_array
 from helpers import search_nodes_in_domain, N, find_nearest_nodes
+from params import NODES_NUMBER_RADIAL
 from integration_points import create_integration_points_bound
 from shape_function.shape_function import F
 import numpy as np
 
 
-def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_bound=False, x_bound=False):
+def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x_bound=False):
 
     # Вычисления координат точек Гаусса на границах
     # Нижняя горизонтальная граница, v = 0
@@ -16,7 +17,7 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
     integration_points_x = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
 
     rows = 2 * len(nodes)
-    cols = nodes_number * 2 * 2
+    cols = NODES_NUMBER_RADIAL * 2 * 2
     G = np.zeros((rows, cols))
 
     bound_index = 0  # Индексирования узлов на границе
@@ -91,7 +92,7 @@ def G_global(nodes, nodes_coords, nodes_number,y_value=False, x_value=False, y_b
 
         bound_index += 1
 
-    print("Матрица G создана...")
+    print(f"Матрица G {G.shape} создана...")
 
     return G
 

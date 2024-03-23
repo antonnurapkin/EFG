@@ -70,6 +70,6 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
 
         bound_index += 1
 
-    print("Вектор q создан...")
+    print(f"Вектор q {q.shape} создан...")
 
     return q
