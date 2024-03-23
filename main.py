@@ -8,7 +8,7 @@ from matrices.G_matrix import G_global
 from matrices.q_vector import q_global
 from postprocessing.displacements import get_real_displacements
 from params import A, NODES_NUMBER_TETTA, NODES_NUMBER_RADIAL, B, R0, FI_DELTA
-from postprocessing.vizualization import show_displacement, show_deformed_shape
+from postprocessing.vizualization import show_displacement, show_deformed_shape, show_nodes
 
 
 def main():
@@ -24,6 +24,8 @@ def main():
 
     # Создание матрицы с координатами для удобства
     nodes_coords = get_nodes_coords(nodes=nodes)
+
+    show_nodes(nodes_coords=nodes_coords)
 
     # Точки Гаусса
     integration_points = create_integration_points(nodes_coords=nodes_coords, nodes_number=NODES_NUMBER_RADIAL)

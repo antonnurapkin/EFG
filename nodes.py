@@ -20,16 +20,6 @@ def create_nodes(nodes_number_radial, nodes_number_tetta, a, b, fi_delta, r0):
     nodes = np.array([])
     global_index = 0
 
-    # Для просто прямоугольника
-    # step_x = a / (nodes_number - 1)
-    # step_y = b / (nodes_number - 1)
-    #
-    # for i in range(nodes_number):
-    #     for j in range(nodes_number):
-    #         nodes = np.append(nodes, [Node(step_x * i, step_y * j, global_index)])
-    #         global_index += 1
-
-
     # Вертикальная граница
     for i in range(nodes_number_tetta):
         x_right_bound = a

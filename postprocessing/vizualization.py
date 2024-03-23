@@ -79,6 +79,11 @@ def show_deformed_shape(nodes, a, b):
     create_scatterplot(x1=x1, y1=y1, x2=x2, y2=y2, indexes=global_indexes)
 
 
+def show_nodes(nodes_coords):
+    fig = go.Figure(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode="markers"))
+    fig.update_layout(width=800, height=800)
+    fig.show()
+
 
 
 
