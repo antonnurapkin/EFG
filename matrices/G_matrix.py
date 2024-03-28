@@ -11,10 +11,10 @@ def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x
 
     # Вычисления координат точек Гаусса на границах
     # Нижняя горизонтальная граница, v = 0
-    integration_points_y = np.flip(create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound))
+    integration_points_bottom = np.flip(create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound))
 
     # Правая вертикальная граница, u = 0
-    integration_points_x = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
+    integration_points_left = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
 
     rows = 2 * len(nodes)
     cols = NODES_NUMBER_RADIAL * 2 * 2
@@ -23,7 +23,7 @@ def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x
     bound_index = 0  # Индексирования узлов на границе
 
     # Нижняя горизонтальная граница, v = 0
-    for points_between_nodes in integration_points_y:  # Общий цикл
+    for points_between_nodes in integration_points_bottom:  # Общий цикл
         for point in points_between_nodes:  # Цикл для точек внутри "ячейки"
 
             r_array = calculate_r(q_point=point, coords=nodes_coords)
@@ -38,15 +38,13 @@ def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x
             # Поиск соседних узлов
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, y_value=y_value, y_bound=y_bound)
 
-            N1 = N(point.x, right, left)
+            N1 = N(g_pos=point.x, left_bound=left, right_bound=right)
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])  # Для удобства
 
             for i in range(len(nodes_in_domain)):
-                F_i = F_array[i] * np.eye(2)
-
-                G1 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N1 * S)
-                G2 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N2 * S)
+                G1 = -point.jacobian * point.weight * F_array[i] * N1 * S
+                G2 = -point.jacobian * point.weight * F_array[i] * N2 * S
 
                 k = int(global_indexes[i])
                 m = bound_index
@@ -60,7 +58,7 @@ def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x
     bound_index += 1
 
     # Левая вертикальная граница, u = 0
-    for points_between_nodes in integration_points_x:
+    for points_between_nodes in integration_points_left:
         for point in points_between_nodes:
             r_array = calculate_r(q_point=point, coords=nodes_coords)
             global_indexes = search_nodes_in_domain(r_array=r_array)
@@ -73,15 +71,13 @@ def G_global(nodes, nodes_coords, y_value=False, x_value=False, y_bound=False, x
 
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, x_value=x_value, x_bound=x_bound)
 
-            N1 = N(point.y, right, left)
+            N1 = N(g_pos=point.y, left_bound=left, right_bound=right)
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])
 
             for i in range(len(nodes_in_domain)):
-                F_i = F_array[i] * np.eye(2)
-
-                G1 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N1 * S)
-                G2 = -point.jacobian * point.weight * np.dot(np.transpose(F_i), N2 * S)
+                G1 = -point.jacobian * point.weight * F_array[i] * N1 * S
+                G2 = -point.jacobian * point.weight * F_array[i] * N2 * S
 
                 k = int(global_indexes[i])
                 m = bound_index

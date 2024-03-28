@@ -22,7 +22,7 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
 
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, y_value=y_value, y_bound=y_bound)
 
-            N1 = N(point.x, right, left)
+            N1 = N(point.x, left, right)
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])
 
@@ -50,7 +50,7 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
         for point in points_between_nodes:
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, x_value=x_value, x_bound=x_bound)
 
-            N1 = N(point.y, right, left)
+            N1 = N(g_pos=point.y, left_bound=left, right_bound=right)
             N2 = 1 - N1
             S = np.array([[1, 0], [0, 1]])
 
