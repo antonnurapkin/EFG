@@ -1,7 +1,14 @@
 from plotly import graph_objects as go
 import numpy as np
 from scipy.interpolate import griddata
-from params import R0
+
+from exact_solution import stress_yy
+from helpers import search_nodes_in_domain, B_matrix, dF_array
+from params import R0, D
+from integration_points import create_integration_points_bound
+from shape_function.components_shape_function.radius import r_derivatives, calculate_r
+from shape_function.components_shape_function.weight_function import weight_func_array
+from shape_function.shape_function import F
 
 
 def show_displacement(nodes, nodes_coords):
@@ -26,6 +33,7 @@ def show_displacement(nodes, nodes_coords):
 def create_contourplot(x, y, z, axis, value):
     fig = go.Figure(go.Contour(x=x, y=y, z=z,
                                colorscale='jet',
+                               ncontours=12,
                                contours=dict(start=np.nanmin(z),
                                              end=np.nanmax(z))))
     fig.add_shape(type="circle",
@@ -54,8 +62,7 @@ def calculate_coeff(a, b, u, v):
 
 def create_scatterplot(x1, y1, x2, y2, indexes):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x1, y=y1, text=indexes, mode="markers", name="Недеформированное состояние",
-                             fillcolor='rgba(100,100,255,0.5)'))
+    fig.add_trace(go.Scatter(x=x1, y=y1, text=indexes, mode="markers", name="Недеформированное состояние", opacity=0.5))
     fig.add_trace(go.Scatter(x=x2, y=y2, text=indexes, mode="markers", name="Деформированное состояние"))
 
     fig.update_layout(title_text=f'Деформированное и недеформированное состояние',
@@ -82,18 +89,51 @@ def show_deformed_shape(nodes, nodes_coords, a, b):
     create_scatterplot(x1=x1, y1=y1, x2=x2, y2=y2, indexes=global_indexes)
 
 
-def show_nodes(nodes_coords):
-    fig = go.Figure(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode="markers"))
+def show_geometry(nodes_coords, integration_points):
+    x = [point.x for point in integration_points]
+    y = [point.y for point in integration_points]
+
+    fig = go.Figure(go.Scatter(x=nodes_coords[0], y=nodes_coords[1], mode="markers", name="Узлы"))
+    fig.add_trace(go.Scatter(x=x, y=y, opacity=0.5, mode="markers", name="Точки Гаусса"))
     fig.update_layout(width=800, height=800)
     fig.show()
 
 
-def show_stress(stress, integration_points):
-    x = [point.x for point in integration_points]
-    y = [point.x for point in integration_points]
+def show_stress(nodes, nodes_coords, u):
+    y = nodes_coords[1]
+    ids = np.where(y == 0)[0]
+    bottom_bound_coords = nodes_coords[0][ids]
+    bottom_bound_coords[0] = bottom_bound_coords[0] + 0.01
 
-    stress_xx = np.array([stress[0][i] for i in range(len(stress[0]))])
-    stress_yy = np.array([stress[1][i] for i in range(len(stress[0]))])
+    stress_bottom = np.zeros((3, len(bottom_bound_coords)))
 
-    create_contourplot(x=x, y=y, z=stress_xx, axis="X", value="Напряжения")
-    create_contourplot(x=x, y=y, z=stress_yy, axis="Y", value="Напряжения")
+    for i in range(len(bottom_bound_coords)):
+
+        r_array = calculate_r(q_point=nodes[i], coords=nodes_coords)
+        global_indexes = search_nodes_in_domain(r_array=r_array)
+
+        nodes_in_domain = nodes[global_indexes.astype(int)]
+
+        dF = dF_array(q_point=nodes[i], nodes_in_domain=nodes_in_domain, r_array=r_array, coords=nodes_coords)
+
+        stress_temp = np.zeros((3, 1))
+        for j in range(len(nodes_in_domain)):
+            B_j = B_matrix(dF[:, j])
+
+            stress_temp += np.dot(D, np.dot(B_j, u[2 * j: 2 * j + 2]))
+
+        stress_bottom[0][i] = stress_temp[0]
+        stress_bottom[1][i] = stress_temp[1]
+        stress_bottom[2][i] = stress_temp[2]
+
+    fig = go.Figure(go.Scatter(x=bottom_bound_coords[0], y=stress_bottom[1], mode="markers"))
+    fig.add_trace(go.Scatter(x=bottom_bound_coords[0], y=stress_yy(r=bottom_bound_coords[0], tetta=np.pi / 2), mode="markers"))
+    fig.show()
+
+    # stress_left = np.zeros((num_points, 3))
+
+
+
+
+
+

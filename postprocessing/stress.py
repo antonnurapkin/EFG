@@ -28,7 +28,8 @@ def calculate_stress(u, integration_points, nodes, nodes_coords):
 
             k = int(global_indexes[j])
 
-            stress_temp = np.dot(D, np.dot(B_i, u[2 * k: 2 * k + 2]))
+            u_nodal = np.array([[nodes[k].u_real], [nodes[k].v_real]])
+            stress_temp = np.dot(D, np.dot(B_i, u_nodal))
 
             stress[0, i] = stress_temp[0]
             stress[1, i] = stress_temp[1]
