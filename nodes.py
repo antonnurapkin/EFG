@@ -1,6 +1,7 @@
 import numpy as np
 from helpers import get_x_coord, get_y_coord
-from params import A, B, NODES_NUMBER_RADIAL_NEAR_BOUNDS, NODES_NUMBER_RADIAL_NEAR_HOLE, NODES_NUMBER_TETTA, R0, FI_DELTA, MULTIPLY_COEFF
+from params import A, B, NODES_NUMBER_RADIAL_NEAR_BOUNDS, NODES_NUMBER_RADIAL_NEAR_HOLE, NODES_NUMBER_TETTA, R0, \
+    FI_DELTA, MULTIPLY_COEFF, NODES_NUMBER_ON_BOUND
 
 
 class Node:
@@ -41,13 +42,9 @@ def create_nodes():
 
         r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
 
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS):
+        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
 
-            if j == NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1:
-                x_coord = x_right_bound
-            else:
-                x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
-
+            x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
             y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
 
             nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
@@ -75,17 +72,27 @@ def create_nodes():
 
         r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
 
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS):
-
-            if j == NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1:
-                y_coord = y_top_bound
-            else:
-                y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
-
+        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
+            y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
             x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
 
             nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
             global_index += 1
+
+    step_x = A / (NODES_NUMBER_ON_BOUND - 1)
+    for i in range(NODES_NUMBER_ON_BOUND - 1):
+        x_coord = step_x * i
+        y_coord = B
+        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
+        global_index += 1
+
+    step_y = B / (NODES_NUMBER_ON_BOUND - 1)
+    for i in range(NODES_NUMBER_ON_BOUND):
+        x_coord = B
+        y_coord = step_y * i
+        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
+        global_index += 1
+
 
     print("Узлы созданы...")
 

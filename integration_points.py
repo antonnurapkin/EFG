@@ -1,5 +1,5 @@
 import numpy as np
-from params import NODES_NUMBER_RADIAL
+from params import CELLS_NUMBER, A, B
 
 
 # Точка Гаусса
@@ -48,41 +48,50 @@ def calculate_jacobain(x_coords, y_coords, ksi, nu):
 
 
 # Функция для вычисления координат точек Гаусса внутри "ячеек"
-def create_integration_points(nodes_coords):
+def create_integration_points():
 
     integration_points = np.array([])
 
-    point_local_coords = [
-        [-1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [1 / np.sqrt(3), 1 / np.sqrt(3)],
-        [1 / np.sqrt(3), -1 / np.sqrt(3)],
-        [-1 / np.sqrt(3), -1 / np.sqrt(3)]
-    ]
+    point_local_coords = [-0.861136, -0.339981, 0.339981, 0.861136]
+    weights = [0.347854, 0.652145]
 
-    weight = 1
+    step_x = A / CELLS_NUMBER
+    step_y = B / CELLS_NUMBER
 
-    for i in range(len(nodes_coords[0]) // NODES_NUMBER_RADIAL - 1):
-        for j in range(NODES_NUMBER_RADIAL - 1):
-            x1, y1 = nodes_coords[:, i * NODES_NUMBER_RADIAL + j]
-            x2, y2 = nodes_coords[:, i * NODES_NUMBER_RADIAL + j + 1]
-            x3, y3 = nodes_coords[:, (i + 1) * NODES_NUMBER_RADIAL + j + 1]
-            x4, y4 = nodes_coords[:, (i + 1) * NODES_NUMBER_RADIAL + j]
+    for i in range(CELLS_NUMBER):
+        for j in range(CELLS_NUMBER):
+            x1, y1 = step_x * i, step_y * j
+            x2, y2 = step_x * (i + 1), step_y * j
+            x3, y3 = step_x * (i + 1), step_y * (j + 1)
+            x4, y4 = step_x * i, step_y * (j + 1)
 
             nodes_x_coords = np.array([x1, x2, x3, x4])
             nodes_y_coords = np.array([y1, y2, y3, y4])
 
-            for p in point_local_coords:
-                point_x_coord = get_global_coord(ksi=p[0], nu=p[1], coords=nodes_x_coords)
-                point_y_coord = get_global_coord(ksi=p[0], nu=p[1], coords=nodes_y_coords)
+            for k in range(len(point_local_coords)):
+                for l in range(len(point_local_coords)):
 
-                jacobian = calculate_jacobain(x_coords=nodes_x_coords, y_coords=nodes_y_coords, ksi=p[0], nu=p[1])
+                    if np.abs(point_local_coords[k]) == 0.861136 or np.abs(point_local_coords[l]) == 0.861136:
+                        weight = weights[0]
+                    else:
+                        weight = weights[1]
 
-                integration_points = np.append(
-                    integration_points,
-                    [
-                        Point(x=point_x_coord, y=point_y_coord, weight=weight, jacobian=jacobian)
-                    ]
-                )
+                    point_x_coord = get_global_coord(ksi=point_local_coords[k], nu=point_local_coords[l], coords=nodes_x_coords)
+                    point_y_coord = get_global_coord(ksi=point_local_coords[k], nu=point_local_coords[l], coords=nodes_y_coords)
+
+                    jacobian = calculate_jacobain(
+                        x_coords=nodes_x_coords,
+                        y_coords=nodes_y_coords,
+                        ksi=point_local_coords[k],
+                        nu=point_local_coords[l]
+                    )
+
+                    integration_points = np.append(
+                        integration_points,
+                        [
+                            Point(x=point_x_coord, y=point_y_coord, weight=weight, jacobian=jacobian)
+                        ]
+                    )
 
     print("Точки интегрирования созданы...")
 
