@@ -7,17 +7,17 @@ from exact_solution import u_radial
 
 def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_bound=False):
     # Нижняя горизонтальная граница, v = 0
-    integration_points_y = np.flip(create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound))
+    integration_points_bottom = np.flip(create_integration_points_bound(nodes_coords, y_value=y_value, y_bound=y_bound))
 
     # Правая вертикальная граница, u = 0
-    integration_points_x = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
+    integration_points_left = create_integration_points_bound(nodes_coords, x_value=x_value, x_bound=x_bound)
 
     q = np.zeros((rows, 1))
 
     bound_index = 0
 
     # Нижняя горизонтальная граница, v = 0
-    for points_between_nodes in integration_points_y:
+    for points_between_nodes in integration_points_bottom:
         for point in points_between_nodes:
 
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, y_value=y_value, y_bound=y_bound)
@@ -46,7 +46,7 @@ def q_global(nodes_coords, rows, y_value=False, x_value=False, y_bound=False, x_
     bound_index += 1
 
     # Левая вертикальная граница, u = 0
-    for points_between_nodes in integration_points_x:
+    for points_between_nodes in integration_points_left:
         for point in points_between_nodes:
             right, left = find_nearest_nodes(point=point, nodes_coords=nodes_coords, x_value=x_value, x_bound=x_bound)
 

@@ -1,11 +1,18 @@
 import numpy as np
 
 from helpers import search_nodes_in_domain, dF_array, B_matrix
-from params import D
-from shape_function.components_shape_function.radius import calculate_r
+from integration_points import Point
+from params import D, A, R0
+from shape_function.components_shape_function.radius import calculate_r, r_derivatives
 
 
-def calculate_stress(u, integration_points, nodes, nodes_coords):
+def calculate_stress(nodes, nodes_coords):
+    x = np.linspace(R0 + 0.001, A, 100)
+    integration_points = []
+
+    for i in range(len(x)):
+        integration_points.append(Point(x=x[i], y=0, weight=None, jacobian=None))
+
     stress = np.zeros((3, len(integration_points)))
 
     i = 0
@@ -22,19 +29,16 @@ def calculate_stress(u, integration_points, nodes, nodes_coords):
         # Производная функции формы
         dF = dF_array(q_point=point, nodes_in_domain=nodes_in_domain, r_array=r_array, coords=nodes_coords)
 
+        stress_temp = np.zeros((3,1))
         # Создание матрицы узловой матрица жёсткости
         for j in range(len(nodes_in_domain)):
-            B_i = B_matrix(dF[:, j])
+            B_j = B_matrix(dF[:, j])
+            stress_temp += np.dot(D, np.dot(B_j, np.array([[nodes_in_domain[j].u_real], [nodes_in_domain[j].v_real]])))
 
-            k = int(global_indexes[j])
-
-            u_nodal = np.array([[nodes[k].u_real], [nodes[k].v_real]])
-            stress_temp = np.dot(D, np.dot(B_i, u_nodal))
-
-            stress[0, i] = stress_temp[0]
-            stress[1, i] = stress_temp[1]
-            stress[2, i] = stress_temp[2]
+        stress[0, i] = stress_temp[0]
+        stress[1, i] = stress_temp[1]
+        stress[2, i] = stress_temp[2]
 
         i += 1
 
-    return stress
+    return stress, integration_points
