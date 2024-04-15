@@ -1,7 +1,5 @@
 import numpy as np
-from helpers import get_x_coord, get_y_coord
-from params import A, B, NODES_NUMBER_RADIAL_NEAR_BOUNDS, NODES_NUMBER_RADIAL_NEAR_HOLE, NODES_NUMBER_TETTA, R0, \
-    FI_DELTA, MULTIPLY_COEFF, NODES_NUMBER_ON_BOUND
+from params import A, B, NODES_NUMBER_ON_BOUND_X, NODES_NUMBER_ON_BOUND_Y
 
 
 class Node:
@@ -22,79 +20,14 @@ def create_nodes():
     nodes = np.array([])
     global_index = 0
 
-    # Вертикальная граница
-    for i in range(NODES_NUMBER_TETTA):
-        x_right_bound = A
-        y_right_bound = i * (B / (NODES_NUMBER_TETTA - 1))
-        fi_current = FI_DELTA * i
+    step_x = A / (NODES_NUMBER_ON_BOUND_X - 1)
+    step_y = B / (NODES_NUMBER_ON_BOUND_Y - 1)
 
-        distance = np.sqrt((x_right_bound - get_x_coord(R0, fi_current)) ** 2 + (y_right_bound - get_y_coord(R0, fi_current)) ** 2)
-        r_temp = R0
+    for i in range(NODES_NUMBER_ON_BOUND_X):
+        for j in range(NODES_NUMBER_ON_BOUND_Y):
 
-        for k in range(NODES_NUMBER_RADIAL_NEAR_HOLE):
-            x_coord = get_x_coord(r_temp, fi_current)
-            y_coord = get_y_coord(r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
+            nodes = np.append(nodes, [Node(step_x * i, step_y * j, global_index)])
             global_index += 1
-
-            r_temp += MULTIPLY_COEFF * r_temp * FI_DELTA
-
-        r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
-
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
-
-            x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
-            y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-    fi_middle = fi_current
-
-    # Горизонтальная граница
-    for i in range(NODES_NUMBER_TETTA - 1):
-        x_top_bound = A - (i + 1) * (A / (NODES_NUMBER_TETTA - 1))
-        y_top_bound = B
-        fi_current = FI_DELTA * (i + 1) + fi_middle
-
-        distance = np.sqrt((x_top_bound - get_x_coord(R0, fi_current)) ** 2 + (y_top_bound - get_y_coord(R0, fi_current)) ** 2)
-        r_temp = R0
-
-        for k in range(NODES_NUMBER_RADIAL_NEAR_HOLE):
-            x_coord = get_x_coord(r_temp, fi_current)
-            y_coord = get_y_coord(r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-            r_temp += MULTIPLY_COEFF * r_temp * FI_DELTA
-
-        r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
-
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
-            y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
-            x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-    step_x = A / (NODES_NUMBER_ON_BOUND - 1)
-    for i in range(NODES_NUMBER_ON_BOUND - 1):
-        x_coord = step_x * i
-        y_coord = B
-        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-        global_index += 1
-
-    step_y = B / (NODES_NUMBER_ON_BOUND - 1)
-    for i in range(NODES_NUMBER_ON_BOUND):
-        x_coord = B
-        y_coord = step_y * i
-        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-        global_index += 1
-
-
-    print("Узлы созданы...")
 
     return nodes
 

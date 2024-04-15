@@ -10,10 +10,11 @@ from matrices.G_matrix import G_global
 from matrices.q_vector import q_global
 from postprocessing.displacements import get_real_displacements
 from postprocessing.stress import calculate_stress
-from postprocessing.vizualization import show_displacement, show_deformed_shape, show_geometry, show_stress
+from postprocessing.vizualization import show_displacement, show_deformed_shape, show_geometry
 from plotly import graph_objects as go
 from exact_solution import u_radial, stress_yy
-from params import METHOD
+from params import METHOD, A, B
+import pandas as pd
 
 
 def main():
@@ -39,16 +40,12 @@ def main():
         G = G_global(
             nodes=nodes,
             nodes_coords=nodes_coords,
-            x_bound=True,
-            x_value=0.0,
             y_bound=True,
             y_value=0.0
         )
         q = q_global(
             nodes_coords=nodes_coords,
             rows=G.shape[1],
-            x_bound=True,
-            x_value=0.0,
             y_bound=True,
             y_value=0.0
         )
@@ -89,7 +86,7 @@ def main():
     # Так как функции формы не соответсвуют символу Кронекера, то полученное решение не является действительным перемещением
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
-    stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
+    # stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
 
     # # Перемещения v при y=0
     # x = nodes_coords[0]
@@ -148,32 +145,31 @@ def main():
     # )
     # fig.show()
     #
-    # show_displacement(nodes=nodes, nodes_coords=nodes_coords)
-    # show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+    show_displacement(nodes=nodes, nodes_coords=nodes_coords)
+    show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
 
-    coords = np.array([point.x for point in points])
-    fig = go.Figure(go.Scatter(x=coords, y=stress[1], mode="lines", name="Приближенное решение"))
-    fig.add_trace(go.Scatter(x=coords, y=stress_yy(r=coords, tetta=np.pi / 2), name="Точное решение"))
+    # coords = np.array([point.x for point in points])
+    # fig = go.Figure(go.Scatter(x=coords, y=stress[1], mode="lines", name="Приближенное решение"))
+    #
+    # fig.update_layout(title_text="Напряжения syy стороне y=0",
+    #                                     title_x=0.5,
+    #                                     width=1000,
+    #                                     height=800)
+    #
+    # fig.update_xaxes(
+    #     title_text="x",
+    #     title_font={"size": 25},
+    #     title_standoff=25)
+    #
+    # fig.update_yaxes(
+    #     exponentformat='power',
+    #     showexponent="last",
+    #     title_text="Syy",
+    #     title_font={"size": 25},
+    #     title_standoff=25
+    # )
 
-    fig.update_layout(title_text="Напряжения syy стороне y=0",
-                                        title_x=0.5,
-                                        width=1000,
-                                        height=800)
-
-    fig.update_xaxes(
-        title_text="x",
-        title_font={"size": 25},
-        title_standoff=25)
-
-    fig.update_yaxes(
-        exponentformat='power',
-        showexponent="last",
-        title_text="Syy",
-        title_font={"size": 25},
-        title_standoff=25
-    )
-
-    fig.show()
+    # fig.show()
 
 
 if __name__ == "__main__":

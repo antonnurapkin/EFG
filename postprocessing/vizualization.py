@@ -21,48 +21,17 @@ def show_displacement(nodes, nodes_coords):
     U = griddata((x, y), u, (xr, yr), method='cubic')
     V = griddata((x, y), v, (xr, yr), method='cubic')
 
-    max_data = get_max(disp=u, x=x, y=y)
-    create_contourplot(x=xr[0], y=yr[:, 0], z=U, axis="X", value="Перемещения", max=max_data)
-
-    max_data = get_max(disp=v, x=x, y=y)
-    create_contourplot(x=xr[0], y=yr[:, 0], z=V, axis="Y", value="Перемещения", max=max_data)
+    create_contourplot(x=xr[0], y=yr[:, 0], z=U, axis="X", value="Перемещения")
+    create_contourplot(x=xr[0], y=yr[:, 0], z=V, axis="Y", value="Перемещения")
 
 
-def create_contourplot(x, y, z, axis, value, max=None):
+def create_contourplot(x, y, z, axis, value):
     fig = go.Figure(go.Contour(x=x, y=y, z=z,
                                colorscale='jet',
                                ncontours=12,
                                contours=dict(start=np.nanmin(z),
                                              end=np.nanmax(z)),
                                colorbar=dict(exponentformat='power', showexponent="last")))
-
-    if max:
-        if axis == "Y":
-            place = "bottom right"
-        else:
-            place = "top left"
-        fig.add_trace(go.Scatter(x=[max[1]],
-                                 y=[max[2]],
-                                 mode="markers+text",
-                                 text=["max"],
-                                 textposition=place,
-                                 marker=dict(
-                                     color='red'
-                                 ),
-                                textfont = dict(
-                                    size=16,
-                                    color="white"
-                                )
-                                 ))
-
-    fig.add_shape(type="circle",
-                  xref="x", yref="y",
-                  fillcolor="White",
-                  x0=-R0, y0=-R0, x1=R0, y1=R0,
-                  line_width=0,
-                  )
-    fig.update_xaxes(range=[0, 1])
-    fig.update_yaxes(range=[0, 1])
 
     fig.update_layout(title_text=f'{value} вдоль оси {axis}',
                       title_x=0.5,

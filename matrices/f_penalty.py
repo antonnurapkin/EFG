@@ -56,7 +56,7 @@ def f_penalty(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, 
 
             F_array = F(point, nodes_in_domain, w)
 
-            u_exact = np.array([[0], [u_radial(r=point.y, tetta=0)]])
+            u_exact = np.array([[0], [0]])
             S = np.array([[1, 0], [0, 1]])
 
             for i in range(len(nodes_in_domain)):

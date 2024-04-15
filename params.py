@@ -17,27 +17,22 @@ D = D_init_const * np.array(D_init_array)
 
 '''ПАРАМЕТРЫ ГЕОМЕТРИИ'''
 A = 1  # Размер пластины в направлении оси Х
-B = 1  # Размер пластины в направлении оси Y
+B = 2  # Размер пластины в направлении оси Y
 R0 = A / 5 # Радиус отверстия
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
-METHOD = "Penalty" #Lagrange
+METHOD = "Lagrange" # Cubic
 
-MULTIPLY_COEFF = 1.75
-NODES_NUMBER_TETTA = 8
-NODES_NUMBER_RADIAL_NEAR_HOLE = 5
-NODES_NUMBER_RADIAL_NEAR_BOUNDS = 8
-NODES_NUMBER_ON_BOUND = 10
-NODES_NUMBER_RADIAL = NODES_NUMBER_RADIAL_NEAR_HOLE + NODES_NUMBER_RADIAL_NEAR_BOUNDS
-CELLS_NUMBER = 13
+NODES_NUMBER_ON_BOUND_X = 7
+NODES_NUMBER_ON_BOUND_Y = 14
+CELLS_NUMBER = 10
 
-PENALTY = E * 4e5
+PENALTY = E * 100
 
-FI_DELTA = np.pi / (2 * ((NODES_NUMBER_TETTA - 1) * 2))  # Шаг угла для разбиения
 
-ALPHA_X = 2.5  # Размер области поддержки
-DC_X = ((1 / 4 * ALPHA_X) ** 2) / (np.sqrt(10) - 1)  # характеристическая длина ( расстояние между двумя узлами )
+ALPHA_X = 4  # Размер области поддержки
+DC_X = np.min([A / NODES_NUMBER_ON_BOUND_X, B / NODES_NUMBER_ON_BOUND_Y])
 
 DS = ALPHA_X * DC_X
 
