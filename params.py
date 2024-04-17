@@ -17,16 +17,16 @@ D = D_init_const * np.array(D_init_array)
 
 '''ПАРАМЕТРЫ ГЕОМЕТРИИ'''
 A = 1  # Размер пластины в направлении оси Х
-B = 2  # Размер пластины в направлении оси Y
+B = 3  # Размер пластины в направлении оси Y
 R0 = A / 5 # Радиус отверстия
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
 METHOD = "Lagrange" # Cubic
 
-NODES_NUMBER_ON_BOUND_X = 7
-NODES_NUMBER_ON_BOUND_Y = 14
-CELLS_NUMBER = 10
+NODES_NUMBER_ON_BOUND_X = 10
+NODES_NUMBER_ON_BOUND_Y = 20
+CELLS_NUMBER = 12
 
 PENALTY = E * 100
 

@@ -2,7 +2,7 @@ import numpy as np
 
 from helpers import search_nodes_in_domain, dF_array, B_matrix
 from integration_points import Point
-from params import D, B
+from params import D, B, A
 from shape_function.components_shape_function.radius import calculate_r, r_derivatives
 
 
@@ -11,7 +11,7 @@ def calculate_stress(nodes, nodes_coords):
     integration_points = []
 
     for i in range(len(y)):
-        integration_points.append(Point(x=0, y=y, weight=None, jacobian=None))
+        integration_points.append(Point(x=A/2, y=y[i], weight=None, jacobian=None))
 
     stress = np.zeros((3, len(integration_points)))
 

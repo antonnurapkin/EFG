@@ -33,7 +33,7 @@ def main():
     K = K_global(nodes=nodes, integration_points=integration_points, nodes_coords=nodes_coords)
 
     # Вектор сил(алгоритм аналогичен матрице K)
-    f = f_global(nodes=nodes, nodes_coords=nodes_coords, y_bound=True, y_value=1)
+    f = f_global(nodes=nodes, nodes_coords=nodes_coords, y_bound=True, y_value=B)
 
     if METHOD == "Lagrange":
         # Матрица для соблюдения ГУ
@@ -86,7 +86,7 @@ def main():
     # Так как функции формы не соответсвуют символу Кронекера, то полученное решение не является действительным перемещением
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
-    # stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
+    stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
 
     # # Перемещения v при y=0
     # x = nodes_coords[0]
@@ -148,28 +148,29 @@ def main():
     show_displacement(nodes=nodes, nodes_coords=nodes_coords)
     show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
 
-    # coords = np.array([point.x for point in points])
-    # fig = go.Figure(go.Scatter(x=coords, y=stress[1], mode="lines", name="Приближенное решение"))
-    #
-    # fig.update_layout(title_text="Напряжения syy стороне y=0",
-    #                                     title_x=0.5,
-    #                                     width=1000,
-    #                                     height=800)
-    #
-    # fig.update_xaxes(
-    #     title_text="x",
-    #     title_font={"size": 25},
-    #     title_standoff=25)
-    #
-    # fig.update_yaxes(
-    #     exponentformat='power',
-    #     showexponent="last",
-    #     title_text="Syy",
-    #     title_font={"size": 25},
-    #     title_standoff=25
-    # )
+    coords = np.array([point.y for point in points])
+    fig = go.Figure(go.Scatter(x=coords, y=stress[1], mode="lines", name="Приближенное решение"))
 
-    # fig.show()
+    fig.update_layout(title_text="Напряжения syy стороне y=0",
+                                        title_x=0.5,
+                                        width=1000,
+                                        height=800)
+
+    fig.update_xaxes(
+        title_text="x",
+        title_font={"size": 25},
+        title_standoff=25)
+
+    fig.update_yaxes(
+        range=[0, np.max(stress[1]) * 1.1],
+        exponentformat='power',
+        showexponent="last",
+        title_text="Syy",
+        title_font={"size": 25},
+        title_standoff=25
+    )
+
+    fig.show()
 
 
 if __name__ == "__main__":
