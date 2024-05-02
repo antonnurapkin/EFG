@@ -7,7 +7,7 @@ from shape_function.components_shape_function.radius import calculate_r, r_deriv
 
 
 def calculate_stress(nodes, nodes_coords):
-    x = np.linspace(R0 + 0.001, A, 100)
+    x = np.linspace(R0 + 0.001, A, 107)
     integration_points = []
 
     for i in range(len(x)):
@@ -33,7 +33,7 @@ def calculate_stress(nodes, nodes_coords):
         # Создание матрицы узловой матрица жёсткости
         for j in range(len(nodes_in_domain)):
             B_j = B_matrix(dF[:, j])
-            stress_temp += np.dot(D, np.dot(B_j, np.array([[nodes_in_domain[j].u_real], [nodes_in_domain[j].v_real]])))
+            stress_temp += np.dot(D, np.dot(B_j, np.array([[nodes_in_domain[j].u_solution], [nodes_in_domain[j].v_solution]])))
 
         stress[0, i] = stress_temp[0]
         stress[1, i] = stress_temp[1]
