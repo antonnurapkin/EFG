@@ -1,5 +1,4 @@
 import numpy as np
-
 from params import DS
 
 
@@ -30,6 +29,7 @@ def r_derivatives(r_array, coords, q_point):
     drdx_array = drdx(r_array, coords, q_point)
 
     return drdx_array, drdy_array
+
 
 
 

@@ -4,8 +4,7 @@ from shape_function.components_shape_function.radius import calculate_r, r_deriv
 from integration_points import create_integration_points_bound
 from shape_function.shape_function import F
 from shape_function.components_shape_function.weight_function import weight_func_array
-from helpers import get_rad, get_tetta
-from exact_solution import stress_yy, stress_yx
+from params import P
 
 
 def f_global(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y_value=False):
@@ -28,9 +27,7 @@ def f_global(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y
             F_array = F(point, nodes_in_domain, w)
 
             for i in range(len(nodes_in_domain)):
-                tetta = get_tetta(x=point.x, y=point.y)
-                rad = get_rad(tetta=tetta, x=point.x)
-                t = np.array([[0], [stress_yy(r=rad, tetta=tetta)]])
+                t = np.array([[0], [P]])
                 f_local = point.jacobian * point.weight * F_array[i] * t
 
                 k = int(global_indexes[i])

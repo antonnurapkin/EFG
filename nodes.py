@@ -1,7 +1,5 @@
 import numpy as np
-from helpers import get_x_coord, get_y_coord
-from params import A, B, NODES_NUMBER_RADIAL_NEAR_BOUNDS, NODES_NUMBER_RADIAL_NEAR_HOLE, NODES_NUMBER_TETTA, R0, \
-    FI_DELTA, MULTIPLY_COEFF, NODES_NUMBER_ON_BOUND
+from params import A, B, NODES_NUMBER_ON_BOUND_X, NODES_NUMBER_ON_BOUND_Y, CRACK_LENGTH, CRACK_HALF_WIDTH, NODES_ON_CRACK
 
 
 class Node:
@@ -22,79 +20,84 @@ def create_nodes():
     nodes = np.array([])
     global_index = 0
 
-    # Вертикальная граница
-    for i in range(NODES_NUMBER_TETTA):
-        x_right_bound = A
-        y_right_bound = i * (B / (NODES_NUMBER_TETTA - 1))
-        fi_current = FI_DELTA * i
+    step_x = A / (NODES_NUMBER_ON_BOUND_X - 1)
+    step_y = A / (NODES_NUMBER_ON_BOUND_Y - 1)
 
-        distance = np.sqrt((x_right_bound - get_x_coord(R0, fi_current)) ** 2 + (y_right_bound - get_y_coord(R0, fi_current)) ** 2)
-        r_temp = R0
+    for i in range(NODES_NUMBER_ON_BOUND_X):
+        for j in range(NODES_NUMBER_ON_BOUND_Y):
 
-        for k in range(NODES_NUMBER_RADIAL_NEAR_HOLE):
-            x_coord = get_x_coord(r_temp, fi_current)
-            y_coord = get_y_coord(r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
+            nodes = np.append(nodes, [Node(x=step_x * i, y=step_y * j, global_index=global_index)])
             global_index += 1
 
-            r_temp += MULTIPLY_COEFF * r_temp * FI_DELTA
+    nodes, crack_top_ind = create_crack(nodes=nodes, global_index=global_index)
 
-        r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
-
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
-
-            x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
-            y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-    fi_middle = fi_current
-
-    # Горизонтальная граница
-    for i in range(NODES_NUMBER_TETTA - 1):
-        x_top_bound = A - (i + 1) * (A / (NODES_NUMBER_TETTA - 1))
-        y_top_bound = B
-        fi_current = FI_DELTA * (i + 1) + fi_middle
-
-        distance = np.sqrt((x_top_bound - get_x_coord(R0, fi_current)) ** 2 + (y_top_bound - get_y_coord(R0, fi_current)) ** 2)
-        r_temp = R0
-
-        for k in range(NODES_NUMBER_RADIAL_NEAR_HOLE):
-            x_coord = get_x_coord(r_temp, fi_current)
-            y_coord = get_y_coord(r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-            r_temp += MULTIPLY_COEFF * r_temp * FI_DELTA
-
-        r_delta = (distance - (r_temp - R0)) / (NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1)
-
-        for j in range(NODES_NUMBER_RADIAL_NEAR_BOUNDS - 1):
-            y_coord = get_y_coord(r_delta * j + r_temp, fi_current)
-            x_coord = get_x_coord(r_delta * j + r_temp, fi_current)
-
-            nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-            global_index += 1
-
-    step_x = A / (NODES_NUMBER_ON_BOUND - 1)
-    for i in range(NODES_NUMBER_ON_BOUND - 1):
-        x_coord = step_x * i
-        y_coord = B
-        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-        global_index += 1
-
-    step_y = B / (NODES_NUMBER_ON_BOUND - 1)
-    for i in range(NODES_NUMBER_ON_BOUND):
-        x_coord = B
-        y_coord = step_y * i
-        nodes = np.append(nodes, [Node(x_coord, y_coord, global_index)])
-        global_index += 1
-
+    nodes = seal_around_top(nodes=nodes, crack_top_ind=crack_top_ind)
 
     print("Узлы созданы...")
+
+    return nodes, crack_top_ind
+
+
+def create_crack(nodes, global_index):
+    rad = (CRACK_LENGTH ** 2 + CRACK_HALF_WIDTH ** 2) / (2 * CRACK_HALF_WIDTH)
+    x0 = 0
+    y0_high_bound = (B / 2 + CRACK_HALF_WIDTH) - rad
+    y0_low_bound = (B / 2 - CRACK_HALF_WIDTH) + rad
+
+    step = CRACK_LENGTH / (NODES_ON_CRACK - 1)
+
+    crack_top_ind = None
+
+    for i in range(NODES_ON_CRACK):
+        x = step * i
+        if i != NODES_ON_CRACK - 1:
+            y_high_bound = np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_high_bound
+            y_low_bound = -np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_low_bound
+
+            nodes = np.append(nodes, [Node(x=x, y=y_high_bound, global_index=global_index)])
+            global_index += 1
+
+            nodes = np.append(nodes, [Node(x=x, y=y_low_bound, global_index=global_index)])
+            global_index += 1
+        else:
+            y_high_bound = np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_high_bound
+            nodes = np.append(nodes, [Node(x=x, y=y_high_bound, global_index=global_index)])
+            crack_top_ind = global_index
+            global_index += 1
+
+    return nodes, crack_top_ind
+
+
+def seal_around_top(nodes, crack_top_ind):
+
+    global_index = nodes[-1].global_index + 1
+
+    # Параметры уплотнения
+    rad_step = CRACK_LENGTH / 15
+
+    fi_0 = np.pi - np.pi / 6
+    fi_current = fi_0
+    fi_step = np.pi / 6
+    fi_end = -fi_0
+
+    # Координаты вершины трещины
+    crack_top = nodes[crack_top_ind]
+    x0, y0 = crack_top.x, crack_top.y
+
+    while fi_current >= fi_end:
+        for i in range(1, 4):
+            nodes = np.append(
+                nodes,
+                [Node(
+                    x=i * rad_step * np.cos(fi_current) + x0,
+                    y=i * rad_step * np.sin(fi_current) + y0,
+                    global_index=global_index
+                )]
+            )
+
+            global_index += 1
+
+        fi_current -= fi_step
 
     return nodes
 

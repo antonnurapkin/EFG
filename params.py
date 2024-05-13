@@ -18,32 +18,41 @@ D = D_init_const * np.array(D_init_array)
 '''ПАРАМЕТРЫ ГЕОМЕТРИИ'''
 A = 1  # Размер пластины в направлении оси Х
 B = 1  # Размер пластины в направлении оси Y
-R0 = A / 5 # Радиус отверстия
+CRACK_LENGTH = B / 2
+CRACK_HALF_WIDTH = B / 100
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
-METHOD = "Penalty" #Lagrange
+METHOD = "Lagrange"  # Penalty
 
-MULTIPLY_COEFF = 1.75
-NODES_NUMBER_TETTA = 4
-NODES_NUMBER_RADIAL_NEAR_HOLE = 3
-NODES_NUMBER_RADIAL_NEAR_BOUNDS = 5
-NODES_NUMBER_ON_BOUND = 10
-NODES_NUMBER_RADIAL = NODES_NUMBER_RADIAL_NEAR_HOLE + NODES_NUMBER_RADIAL_NEAR_BOUNDS
-CELLS_NUMBER = 8
+NODES_NUMBER_ON_BOUND_X = 15
+NODES_NUMBER_ON_BOUND_Y = 14
+NODES_ON_CRACK = 15
+CELLS_NUMBER = 15
 
 PENALTY = E * 4e5
 
-FI_DELTA = np.pi / (2 * ((NODES_NUMBER_TETTA - 1) * 2))  # Шаг угла для разбиения
-
 ALPHA_X = 3  # Размер области поддержки
-DC_X = ((1 / 4 * ALPHA_X) ** 2) / (np.sqrt(10) - 1)  # характеристическая длина ( расстояние между двумя узлами )
+DC_X = A / (NODES_NUMBER_ON_BOUND_X - 1)  # характеристическая длина ( расстояние между двумя узлами )
 
 DS = ALPHA_X * DC_X
 
 WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
+LAMBDA = 1
+
 
 '''НАГРУЗКА'''
 P = 10000
+
+
+'''Трещина'''
+x1 = 0
+y1 = B / 2
+
+x2 = CRACK_LENGTH
+y2 = B / 2
+
+K = ((y2 - y1) / (x2 - x1))
+CONST = y1 - ((y2 - y1) / (x2 - x1)) * x1
 

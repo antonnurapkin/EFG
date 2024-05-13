@@ -2,7 +2,7 @@ from plotly import graph_objects as go
 import numpy as np
 from scipy.interpolate import griddata
 
-from params import R0
+from postprocessing.crack import create_upper_crack_bound, create_lower_crack_bound
 from postprocessing.helpers import calculate_coeff, get_max
 
 
@@ -36,31 +36,14 @@ def create_contourplot(x, y, z, axis, value, max=None):
                                              end=np.nanmax(z)),
                                colorbar=dict(exponentformat='power', showexponent="last")))
 
-    if max:
-        if axis == "Y":
-            place = "bottom right"
-        else:
-            place = "top left"
-        fig.add_trace(go.Scatter(x=[max[1]],
-                                 y=[max[2]],
-                                 mode="markers+text",
-                                 text=["max"],
-                                 textposition=place,
-                                 marker=dict(
-                                     color='red'
-                                 ),
-                                textfont = dict(
-                                    size=16,
-                                    color="white"
-                                )
-                                 ))
+    y_up, x_up = create_upper_crack_bound()
+    y_low, x_low = create_lower_crack_bound()
 
-    fig.add_shape(type="circle",
-                  xref="x", yref="y",
-                  fillcolor="White",
-                  x0=-R0, y0=-R0, x1=R0, y1=R0,
-                  line_width=0,
-                  )
+    fig.add_trace(go.Scatter(x=x_low, y=y_low, mode="lines", name='', line=dict(width=0.1, color='rgb(255, 255, 255)')))
+    fig.add_trace(go.Scatter(x=x_up, y=y_up, mode="lines", fill='tonexty', fillcolor="white", name='',
+                             line=dict(width=0.1, color='rgb(255, 255, 255)')))
+
+
     fig.update_xaxes(range=[0, 1])
     fig.update_yaxes(range=[0, 1])
 

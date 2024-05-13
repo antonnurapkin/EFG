@@ -5,17 +5,31 @@ from shape_function.components_shape_function.weight_function import weight_func
 from shape_function.components_shape_function.radius import r_derivatives
 
 
-def dF_array(q_point, nodes_in_domain, r_array, coords):
+def dF_array(q_point, nodes_in_domain, r_array, coords, drdx_add, drdy_add):
 
-    drdx, drdy = r_derivatives(r_array, coords, q_point)
-    w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
+    drdx, drdy = r_derivatives(r_array=r_array, coords=coords, q_point=q_point)
+
+    if drdy_add is not None and drdx_add is not None :
+        drdx = add_crack_nodes(dr=drdx, dr_add=drdx_add)
+        drdy = add_crack_nodes(dr=drdy, dr_add=drdy_add)
+
+    w, dwdx, dwdy = weight_func_array(r=r_array, drdx=drdx, drdy=drdy)
 
     dF = np.vstack([
-        dFdx(q_point, nodes_in_domain, w, dwdx),
-        dFdy(q_point, nodes_in_domain, w, dwdy)
+        dFdx(point=q_point, all_points=nodes_in_domain, w=w, dwdx=dwdx),
+        dFdy(point=q_point, all_points=nodes_in_domain, w=w, dwdy=dwdy)
     ])
 
     return dF
+
+
+def add_crack_nodes(dr, dr_add):
+    ids = np.where(dr_add != 0)[0]
+
+    for index in ids:
+        dr[index] = dr_add[index]
+
+    return dr
 
 
 def B_matrix(F_i):
@@ -73,3 +87,7 @@ def find_nearest_nodes(point, nodes_coords, y_value=False, x_value=False, y_boun
         return bound_nodes_coords[other_coord][idx], bound_nodes_coords[other_coord][idx - 1]
     elif bound_nodes_coords[other_coord][idx] < point_coord:
         return bound_nodes_coords[other_coord][idx + 1], bound_nodes_coords[other_coord][idx]
+
+
+def distance(x1, y1, x2, y2):
+    return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)

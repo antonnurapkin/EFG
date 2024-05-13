@@ -5,7 +5,6 @@ from integration_points import create_integration_points_bound
 from shape_function.shape_function import F
 from shape_function.components_shape_function.weight_function import weight_func_array
 from params import PENALTY
-from exact_solution import u_radial
 
 
 def f_penalty(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y_value=False):

@@ -2,7 +2,7 @@ import numpy as np
 
 from helpers import search_nodes_in_domain, dF_array, B_matrix
 from integration_points import Point
-from params import D, A, R0
+from params import D, A
 from shape_function.components_shape_function.radius import calculate_r, r_derivatives
 
 
