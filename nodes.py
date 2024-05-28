@@ -77,7 +77,7 @@ def seal_around_top(nodes, crack_top_ind):
 
     fi_0 = np.pi - np.pi / 6
     fi_current = fi_0
-    fi_step = np.pi / 6
+    fi_step = np.pi / 12
     fi_end = -fi_0
 
     # Координаты вершины трещины

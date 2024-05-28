@@ -93,10 +93,17 @@ def main():
     # Так как функции формы не соответсвуют символу Кронекера, то полученное решение не является действительным перемещением
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
-    # stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
 
     show_displacement(nodes=nodes, nodes_coords=nodes_coords)
     show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+
+    stress = calculate_stress(
+        nodes_coords=nodes_coords,
+        nodes=nodes,
+        crack_top_ind=crack_top_ind,
+        integration_points=integration_points
+    )
+    show_stress(nodes_coords=nodes_coords, stress=stress, integration_points=integration_points)
 
 
 if __name__ == "__main__":
