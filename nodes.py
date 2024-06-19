@@ -39,10 +39,8 @@ def create_nodes():
 
 
 def create_crack(nodes, global_index):
-    rad = (CRACK_LENGTH ** 2 + CRACK_HALF_WIDTH ** 2) / (2 * CRACK_HALF_WIDTH)
     x0 = 0
-    y0_high_bound = (B / 2 + CRACK_HALF_WIDTH) - rad
-    y0_low_bound = (B / 2 - CRACK_HALF_WIDTH) + rad
+    y0 = B / 2
 
     step = CRACK_LENGTH / (NODES_ON_CRACK - 1)
 
@@ -51,8 +49,8 @@ def create_crack(nodes, global_index):
     for i in range(NODES_ON_CRACK):
         x = step * i
         if i != NODES_ON_CRACK - 1:
-            y_high_bound = np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_high_bound
-            y_low_bound = -np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_low_bound
+            y_high_bound = CRACK_HALF_WIDTH * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
+            y_low_bound = -1 * CRACK_HALF_WIDTH * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
 
             nodes = np.append(nodes, [Node(x=x, y=y_high_bound, global_index=global_index)])
             global_index += 1
@@ -60,7 +58,7 @@ def create_crack(nodes, global_index):
             nodes = np.append(nodes, [Node(x=x, y=y_low_bound, global_index=global_index)])
             global_index += 1
         else:
-            y_high_bound = np.sqrt(rad ** 2 - (x - x0) ** 2) + y0_high_bound
+            y_high_bound = CRACK_HALF_WIDTH * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
             nodes = np.append(nodes, [Node(x=x, y=y_high_bound, global_index=global_index)])
             crack_top_ind = global_index
             global_index += 1
@@ -73,11 +71,11 @@ def seal_around_top(nodes, crack_top_ind):
     global_index = nodes[-1].global_index + 1
 
     # Параметры уплотнения
-    rad_step = CRACK_LENGTH / 15
+    rad_step = CRACK_LENGTH / 20
 
     fi_0 = np.pi - np.pi / 6
     fi_current = fi_0
-    fi_step = np.pi / 12
+    fi_step = np.pi / 10
     fi_end = -fi_0
 
     # Координаты вершины трещины
@@ -85,7 +83,7 @@ def seal_around_top(nodes, crack_top_ind):
     x0, y0 = crack_top.x, crack_top.y
 
     while fi_current >= fi_end:
-        for i in range(1, 4):
+        for i in range(1, 5):
             nodes = np.append(
                 nodes,
                 [Node(

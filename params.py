@@ -27,8 +27,8 @@ METHOD = "Lagrange"  # Penalty
 
 NODES_NUMBER_ON_BOUND_X = 20
 NODES_NUMBER_ON_BOUND_Y = 20
-NODES_ON_CRACK = 30
-CELLS_NUMBER = 24
+NODES_ON_CRACK = 40
+CELLS_NUMBER = 25
 
 PENALTY = E * 4e5
 
@@ -39,7 +39,7 @@ DS = ALPHA_X * DC_X
 
 WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
-LAMBDA = 1
+LAMBDA = 2
 
 
 '''НАГРУЗКА'''
