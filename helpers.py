@@ -1,6 +1,6 @@
 import numpy as np
 
-from shape_function.shape_function import dFdx, dFdy
+from shape_function.shape_function import dFdx, dFdy, F
 from shape_function.components_shape_function.weight_function import weight_func_array
 from shape_function.components_shape_function.radius import r_derivatives
 

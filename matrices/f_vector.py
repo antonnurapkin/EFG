@@ -24,8 +24,6 @@ def f_global(nodes, nodes_coords, x_bound=False, y_bound=False, x_value=False, y
             drdx, drdy = r_derivatives(r_array, nodes_coords, point)
             w, dwdx, dwdy = weight_func_array(r_array, drdx, drdy)
 
-            F_array = F(point, nodes_in_domain, w)
-
             for i in range(len(nodes_in_domain)):
                 t = np.array([[0], [P]])
                 f_local = point.jacobian * point.weight * F_array[i] * t

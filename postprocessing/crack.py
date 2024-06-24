@@ -13,7 +13,7 @@ def create_upper_crack_bound():
 
     for i in range(NODES_ON_CRACK):
         x = step * i
-        y_high_bound = B / 200 * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
+        y_high_bound = CRACK_HALF_WIDTH * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
 
         y_arr.append(y_high_bound)
         x_arr.append(x)
@@ -32,7 +32,7 @@ def create_lower_crack_bound():
 
     for i in range(NODES_ON_CRACK):
         x = step * i
-        y_low_bound = -1 * B / 200 * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
+        y_low_bound = -1 * CRACK_HALF_WIDTH * np.sqrt(1 - ((x - x0) / CRACK_LENGTH) ** 2) + y0
 
         y_arr.append(y_low_bound)
         x_arr.append(x)

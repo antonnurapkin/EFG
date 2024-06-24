@@ -32,10 +32,14 @@ def show_displacement(nodes, nodes_coords):
 def create_contourplot(x, y, z, axis, value, max=None):
     fig = go.Figure(go.Contour(x=x, y=y, z=z,
                                colorscale='jet',
-                               ncontours=12,
+                               line=dict(width=0),
+                               # ncontours=15,
                                contours=dict(start=np.min(z),
                                              end=np.max(z),
                                              size=(np.max(z) - np.min(z)) / 8),
+                               # ncontours=12,
+                               # contours=dict(start=np.nanmin(z),
+                               #               end=np.nanmax(z)),
                                colorbar=dict(
                                    exponentformat='power', showexponent="last"
                                )))
@@ -108,10 +112,12 @@ def show_stress(nodes_coords, stress, integration_points):
     fig = go.Figure(go.Contour(x=x, y=y, z=stress[0],
 
                                colorscale='jet',
-                               ncontours=12,
-                               # contours=dict(start=np.min(stress[0]),
-                               #               end=np.max(stress[0]),
-                               #               size=(np.max(stress[0]) - np.min(stress[0])) / 8),
+                               # ncontours=15,
+                               # contours=dict(start=np.nanmin(stress[0]),
+                               #               end=np.nanmax(stress[0])),
+                               contours=dict(start=np.min(stress[0]),
+                                             end=np.max(stress[0]),
+                                             size=(np.max(stress[0]) - np.min(stress[0])) / 8),
                                line=dict(width=0),
                                colorbar=dict(exponentformat='power', showexponent="last")))
     fig.update_xaxes(range=[0, 1])
@@ -132,10 +138,12 @@ def show_stress(nodes_coords, stress, integration_points):
 
     fig = go.Figure(go.Contour(x=x, y=y, z=stress[1],
                                colorscale='jet',
-                               ncontours=12,
-                               # contours=dict(start=np.min(stress[1]),
-                               #               end=np.max(stress[1]),
-                               #               size=(np.max(stress[1]) - np.min(stress[1])) / 8),
+                               # ncontours=15,
+                               # contours=dict(start=np.nanmin(stress[1]),
+                               #               end=np.nanmax(stress[1])),
+                               contours=dict(start=np.min(stress[1]),
+                                             end=np.max(stress[1]),
+                                             size=(np.max(stress[1]) - np.min(stress[1])) / 8),
                                line=dict(width=0),
                                colorbar=dict(exponentformat='power', showexponent="last")))
 

@@ -71,11 +71,11 @@ def seal_around_top(nodes, crack_top_ind):
     global_index = nodes[-1].global_index + 1
 
     # Параметры уплотнения
-    rad_step = CRACK_LENGTH / 20
+    rad_step = CRACK_LENGTH / 5
 
-    fi_0 = np.pi - np.pi / 6
+    fi_0 = np.pi - np.pi / 9
     fi_current = fi_0
-    fi_step = np.pi / 10
+    fi_step = np.pi / 12
     fi_end = -fi_0
 
     # Координаты вершины трещины

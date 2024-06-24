@@ -29,7 +29,7 @@ def main():
 
     show_geometry(nodes_coords=nodes_coords, integration_points=integration_points)
 
-    # # Матрица жесткости
+    # Матрица жесткости
     K = K_global(
         nodes=nodes,
         integration_points=integration_points,
@@ -95,8 +95,8 @@ def main():
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
 
-    show_displacement(nodes=nodes, nodes_coords=nodes_coords)
-    show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+    # show_displacement(nodes=nodes, nodes_coords=nodes_coords)
+    # show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
 
     stress = calculate_stress(
         nodes_coords=nodes_coords,
