@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from plotly import graph_objects as go
 import numpy as np
 from scipy.interpolate import griddata
@@ -31,10 +32,17 @@ def show_displacement(nodes, nodes_coords):
 def create_contourplot(x, y, z, axis, value, max=None):
     fig = go.Figure(go.Contour(x=x, y=y, z=z,
                                colorscale='jet',
-                               ncontours=12,
-                               contours=dict(start=np.nanmin(z),
-                                             end=np.nanmax(z)),
-                               colorbar=dict(exponentformat='power', showexponent="last")))
+                               line=dict(width=0),
+                               # ncontours=15,
+                               contours=dict(start=np.min(z),
+                                             end=np.max(z),
+                                             size=(np.max(z) - np.min(z)) / 8),
+                               # ncontours=12,
+                               # contours=dict(start=np.nanmin(z),
+                               #               end=np.nanmax(z)),
+                               colorbar=dict(
+                                   exponentformat='power', showexponent="last"
+                               )))
 
     y_up, x_up = create_upper_crack_bound()
     y_low, x_low = create_lower_crack_bound()
@@ -93,7 +101,7 @@ def show_geometry(nodes_coords, integration_points):
     fig.show()
 
 
-def show_stress(integration_points, stress):
+def show_stress(nodes_coords, stress, integration_points):
 
     x, y = [], []
 
@@ -101,22 +109,57 @@ def show_stress(integration_points, stress):
         x.append(point.x)
         y.append(point.y)
 
-    fig = go.Figure(go.Contour(x=x, y=y, z=stress[1],
+    fig = go.Figure(go.Contour(x=x, y=y, z=stress[0],
+
                                colorscale='jet',
-                               ncontours=12,
+                               # ncontours=15,
+                               # contours=dict(start=np.nanmin(stress[0]),
+                               #               end=np.nanmax(stress[0])),
+                               contours=dict(start=np.min(stress[0]),
+                                             end=np.max(stress[0]),
+                                             size=(np.max(stress[0]) - np.min(stress[0])) / 8),
+                               line=dict(width=0),
                                colorbar=dict(exponentformat='power', showexponent="last")))
     fig.update_xaxes(range=[0, 1])
     fig.update_yaxes(range=[0, 1])
+
+    y_up, x_up = create_upper_crack_bound()
+    y_low, x_low = create_lower_crack_bound()
+
+    fig.add_trace(go.Scatter(x=x_low, y=y_low, mode="lines", name='', line=dict(width=0.1, color='rgb(255, 255, 255)')))
+    fig.add_trace(go.Scatter(x=x_up, y=y_up, mode="lines", fill='tonexty', fillcolor="white", name='',
+                             line=dict(width=0.1, color='rgb(255, 255, 255)')))
+
+    fig.update_layout(title_text=f'Напряжения вдоль оси X',
+                      title_x=0.5,
+                      width=800, height=800)
 
     fig.show()
 
-    fig = go.Figure(go.Contour(x=x, y=y, z=stress[0],
+    fig = go.Figure(go.Contour(x=x, y=y, z=stress[1],
                                colorscale='jet',
-                               ncontours=12,
+                               # ncontours=15,
+                               # contours=dict(start=np.nanmin(stress[1]),
+                               #               end=np.nanmax(stress[1])),
+                               contours=dict(start=np.min(stress[1]),
+                                             end=np.max(stress[1]),
+                                             size=(np.max(stress[1]) - np.min(stress[1])) / 8),
+                               line=dict(width=0),
                                colorbar=dict(exponentformat='power', showexponent="last")))
 
     fig.update_xaxes(range=[0, 1])
     fig.update_yaxes(range=[0, 1])
+
+    y_up, x_up = create_upper_crack_bound()
+    y_low, x_low = create_lower_crack_bound()
+
+    fig.add_trace(go.Scatter(x=x_low, y=y_low, mode="lines", name='', line=dict(width=0.1, color='rgb(255, 255, 255)')))
+    fig.add_trace(go.Scatter(x=x_up, y=y_up, mode="lines", fill='tonexty', fillcolor="white", name='',
+                             line=dict(width=0.1, color='rgb(255, 255, 255)')))
+
+    fig.update_layout(title_text=f'Напряжения вдоль оси Y',
+                      title_x=0.5,
+                      width=800, height=800)
 
     fig.show()
 

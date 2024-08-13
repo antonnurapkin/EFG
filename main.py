@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from matrices.K_penalty import K_penalty
@@ -11,11 +13,11 @@ from matrices.q_vector import q_global
 from postprocessing.displacements import get_real_displacements
 from postprocessing.stress import calculate_stress
 from postprocessing.vizualization import show_displacement, show_deformed_shape, show_geometry, show_stress
-from plotly import graph_objects as go
 from params import METHOD, B, A
 
 
 def main():
+    time_start = time.time()
     # Создание узлов
     nodes, crack_top_ind = create_nodes()
 
@@ -27,7 +29,7 @@ def main():
 
     show_geometry(nodes_coords=nodes_coords, integration_points=integration_points)
 
-    # # Матрица жесткости
+    # Матрица жесткости
     K = K_global(
         nodes=nodes,
         integration_points=integration_points,
@@ -89,14 +91,22 @@ def main():
         u = np.dot(np.linalg.inv(K_extended), f_extended)
     print("Уравнение решено...")
 
-
     # Так как функции формы не соответсвуют символу Кронекера, то полученное решение не является действительным перемещением
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
-    # stress, points = calculate_stress(nodes_coords=nodes_coords, nodes=nodes)
 
     show_displacement(nodes=nodes, nodes_coords=nodes_coords)
     show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+
+    stress = calculate_stress(
+        nodes_coords=nodes_coords,
+        nodes=nodes,
+        crack_top_ind=crack_top_ind,
+        integration_points=integration_points
+    )
+    show_stress(nodes_coords=nodes_coords, stress=stress, integration_points=integration_points)
+
+    print(f"Время выполнения: {(time.time() - time_start) // 60} мин")
 
 
 if __name__ == "__main__":

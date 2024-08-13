@@ -18,28 +18,28 @@ D = D_init_const * np.array(D_init_array)
 '''ПАРАМЕТРЫ ГЕОМЕТРИИ'''
 A = 1  # Размер пластины в направлении оси Х
 B = 1  # Размер пластины в направлении оси Y
-CRACK_LENGTH = B / 2
-CRACK_HALF_WIDTH = B / 100
+CRACK_LENGTH = B / 10
+CRACK_HALF_WIDTH = B / 200
 
 
 '''ПАРАМЕТРЫ АППРОКСИМАЦИИ'''
 METHOD = "Lagrange"  # Penalty
 
-NODES_NUMBER_ON_BOUND_X = 15
-NODES_NUMBER_ON_BOUND_Y = 14
-NODES_ON_CRACK = 15
-CELLS_NUMBER = 15
+NODES_NUMBER_ON_BOUND_X = 21
+NODES_NUMBER_ON_BOUND_Y = 21
+NODES_ON_CRACK = 30
+CELLS_NUMBER = 24
 
 PENALTY = E * 4e5
 
-ALPHA_X = 3  # Размер области поддержки
+ALPHA_X = 2  # Размер области поддержки
 DC_X = A / (NODES_NUMBER_ON_BOUND_X - 1)  # характеристическая длина ( расстояние между двумя узлами )
 
 DS = ALPHA_X * DC_X
 
 WEIGHT_FUNCTION_TYPE = "cubic"  # quadratic
 
-LAMBDA = 1
+LAMBDA = 2
 
 
 '''НАГРУЗКА'''
