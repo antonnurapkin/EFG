@@ -95,8 +95,8 @@ def main():
     # Вычисление реальных перемещений на основе полученных узловых параметров
     nodes = get_real_displacements(nodes=nodes, u=u, coords=nodes_coords)
 
-    # show_displacement(nodes=nodes, nodes_coords=nodes_coords)
-    # show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
+    show_displacement(nodes=nodes, nodes_coords=nodes_coords)
+    show_deformed_shape(nodes=nodes, a=A, b=B, nodes_coords=nodes_coords)
 
     stress = calculate_stress(
         nodes_coords=nodes_coords,
@@ -104,9 +104,6 @@ def main():
         crack_top_ind=crack_top_ind,
         integration_points=integration_points
     )
-
-    stress = stress / 10e6
-
     show_stress(nodes_coords=nodes_coords, stress=stress, integration_points=integration_points)
 
     print(f"Время выполнения: {(time.time() - time_start) // 60} мин")
